@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { MobileMenu } from "@/components/mobile-menu";
 import { SiteContainer } from "@/components/site-container";
-import { siteConfig } from "@/config/site";
+import { siteOwnerName } from "@/config/site";
 
 const navigation = [
   { label: "Work", href: "/projects" },
@@ -14,7 +14,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <SiteContainer className="site-header__inner">
-        <Link className="site-logo" href="/" aria-label={`${siteConfig.name}, home`}>
+        <Link className="site-logo" href="/" aria-label={`${siteOwnerName}, home`}>
           AG
         </Link>
 

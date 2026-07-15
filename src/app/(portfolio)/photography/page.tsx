@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
 import { SiteContainer } from "@/components/site-container";
-import { pageSeo } from "@/config/site";
+import { pageSeo, siteOwnerName } from "@/config/site";
 import { photos } from "@/data/photography";
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 import { PhotographyExperience } from "./photography-experience";
 
-export const metadata: Metadata = createPageMetadata(pageSeo.photography);
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return createPageMetadata(pageSeo.photography, settings);
+}
 
-export default function PhotographyPage() {
+export default async function PhotographyPage() {
+  const settings = await getSiteSettings();
+
   return (
     <SiteContainer>
-      <PhotographyExperience photos={photos} />
+      <PhotographyExperience
+        photos={photos}
+        ownerName={siteOwnerName}
+        sharedSettings={{
+          location: settings.location,
+          availabilityLabel: settings.availabilityLabel,
+        }}
+      />
     </SiteContainer>
   );
 }

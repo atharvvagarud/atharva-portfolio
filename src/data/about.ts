@@ -1,11 +1,3 @@
-import { siteConfig } from "@/config/site";
-
-export type AboutLink = {
-  label: string;
-  href: string;
-  external?: boolean;
-};
-
 export type AboutEducation = {
   qualification: string;
   institution: string;
@@ -20,10 +12,6 @@ export type AboutImage = {
   height: number;
 };
 
-export type AboutCv = AboutLink & {
-  available: boolean;
-};
-
 export type AboutData = {
   introduction: string;
   introductionDetail: string;
@@ -33,23 +21,8 @@ export type AboutData = {
   buildAreas: readonly string[];
   capabilities: readonly string[];
   currentFocus: readonly string[];
-  location: string;
-  availability: string;
-  links: readonly AboutLink[];
-  cv: AboutCv;
+  cvCallToActionLabel: string;
 };
-
-const contactLinks: AboutLink[] = [
-  ...(siteConfig.email
-    ? [{ label: "Email", href: `mailto:${siteConfig.email}` }]
-    : []),
-  ...(siteConfig.linkedinUrl
-    ? [{ label: "LinkedIn", href: siteConfig.linkedinUrl, external: true }]
-    : []),
-  ...(siteConfig.githubUrl
-    ? [{ label: "GitHub", href: siteConfig.githubUrl, external: true }]
-    : []),
-];
 
 export const aboutData = {
   introduction: "Useful software, thoughtfully built.",
@@ -98,12 +71,5 @@ export const aboutData = {
     "Exploring AI agents and local models",
     "Looking for graduate software-engineering opportunities",
   ],
-  location: siteConfig.location,
-  availability: "Open to graduate software-engineering opportunities",
-  links: contactLinks,
-  cv: {
-    label: "Download CV",
-    href: "/resume/atharva-garud-cv.pdf",
-    available: false,
-  },
+  cvCallToActionLabel: "Download CV",
 } as const satisfies AboutData;

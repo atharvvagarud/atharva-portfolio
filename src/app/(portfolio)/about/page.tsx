@@ -4,11 +4,16 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
-import { pageSeo, siteConfig } from "@/config/site";
-import { aboutData, type AboutLink } from "@/data/about";
+import { pageSeo } from "@/config/site";
+import { aboutData } from "@/data/about";
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
+import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 
-export const metadata: Metadata = createPageMetadata(pageSeo.about);
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return createPageMetadata(pageSeo.about, settings);
+}
 
 function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
   return (
@@ -20,7 +25,7 @@ function SectionLabel({ number, children }: { number: string; children: React.Re
   );
 }
 
-function AboutLinkItem({ link }: { link: AboutLink }) {
+function AboutLinkItem({ link }: { link: SiteLink }) {
   return (
     <Link
       className="about-link"
@@ -35,7 +40,10 @@ function AboutLinkItem({ link }: { link: AboutLink }) {
   );
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  const contactLinks = getSiteContactLinks(settings);
+
   return (
     <SiteContainer>
       <article className="about-page">
@@ -137,25 +145,25 @@ export default function AboutPage() {
             <h2 id="availability-title">Based in London and ready for what comes next.</h2>
             <p className="about-availability__status">
               <span className="status-dot" aria-hidden="true" />
-              {aboutData.availability}
+              {settings.availabilityLabel}
             </p>
-            <p className="about-availability__location">{aboutData.location}</p>
+            <p className="about-availability__location">{settings.location}</p>
 
-            {aboutData.links.length > 0 ? (
+            {contactLinks.length > 0 ? (
               <nav className="about-availability__links" aria-label="Contact and profile links">
-                {aboutData.links.map((link) => (
+                {contactLinks.map((link) => (
                   <AboutLinkItem key={link.label} link={link} />
                 ))}
               </nav>
             ) : null}
 
-            {aboutData.cv.available ? (
+            {settings.cvFile ? (
               <a
                 className="button-primary about-cv-button"
-                href={aboutData.cv.href}
-                download
+                href={settings.cvFile.downloadUrl}
+                download={settings.cvFile.filename}
               >
-                {aboutData.cv.label}
+                {aboutData.cvCallToActionLabel}
                 <Download aria-hidden="true" size={17} strokeWidth={1.5} />
               </a>
             ) : null}
@@ -166,14 +174,14 @@ export default function AboutPage() {
       <footer className="about-contact" id="contact">
         <div>
           <p>Interested in working together?</p>
-          {siteConfig.email ? (
-            <a href={`mailto:${siteConfig.email}`}>
+          {settings.email ? (
+            <a href={`mailto:${settings.email}`}>
               Get in touch
               <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
             </a>
           ) : null}
         </div>
-        <p>{aboutData.location}</p>
+        <p>{settings.location}</p>
       </footer>
     </SiteContainer>
   );

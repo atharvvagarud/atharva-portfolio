@@ -1,34 +1,13 @@
-export type SiteConfig = {
-  readonly name: string;
-  readonly siteTitle: string;
-  readonly description: string;
-  readonly location: string;
-  readonly siteUrl: string;
-  readonly email: string | null;
-  readonly githubUrl: string | null;
-  readonly linkedinUrl: string | null;
-};
-
-const optionalValue = (value: string | undefined) => value?.trim() || null;
-const configuredSiteUrl = optionalValue(process.env.SITE_URL);
-
-export const siteConfig = {
-  name: "Atharva Garud",
-  siteTitle: "Atharva Garud | Software Engineer",
-  description:
-    "Portfolio of Atharva Garud, a First-Class Computer Science graduate and software engineer based in London.",
-  location: "London, UK",
-  siteUrl: (configuredSiteUrl || "https://atharvagarud.com").replace(/\/+$/, ""),
-  email: optionalValue(process.env.SITE_EMAIL),
-  githubUrl: optionalValue(process.env.GITHUB_URL),
-  linkedinUrl: optionalValue(process.env.LINKEDIN_URL),
-} as const satisfies SiteConfig;
+import {
+  siteOwnerName,
+  siteSettingsFallback,
+} from "@/config/site-fallback";
 
 export type PageSeo = {
   readonly title: string;
   readonly description: string;
   readonly path: `/${string}`;
-  readonly image: `/${string}`;
+  readonly image: string;
   readonly imageAlt: string;
 };
 
@@ -36,8 +15,8 @@ export type PageSeoInput = Pick<PageSeo, "path"> & Partial<Omit<PageSeo, "path">
 
 export const pageSeo = {
   home: {
-    title: siteConfig.siteTitle,
-    description: siteConfig.description,
+    title: siteSettingsFallback.defaultSeoTitle,
+    description: siteSettingsFallback.defaultSeoDescription,
     path: "/",
     image: "/images/og/homepage.png",
     imageAlt: "Atharva Garud software engineering portfolio",
@@ -67,3 +46,5 @@ export const pageSeo = {
     imageAlt: "About Atharva Garud",
   },
 } as const satisfies Record<string, PageSeo>;
+
+export { siteOwnerName };

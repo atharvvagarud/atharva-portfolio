@@ -5,7 +5,6 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { LondonTime } from "@/components/london-time";
-import { siteConfig } from "@/config/site";
 import {
   photoFilters,
   type Photo,
@@ -14,22 +13,34 @@ import {
 
 type PhotographyExperienceProps = {
   photos: readonly Photo[];
+  ownerName: string;
+  sharedSettings: {
+    readonly location: string;
+    readonly availabilityLabel: string;
+  };
 };
 
-function PhotographyFooter() {
+function PhotographyFooter({
+  ownerName,
+  sharedSettings,
+}: Pick<PhotographyExperienceProps, "ownerName" | "sharedSettings">) {
   return (
     <footer className="photography-footer">
-      <p>© {new Date().getFullYear()} {siteConfig.name}</p>
-      <p>{siteConfig.location}</p>
+      <p>© {new Date().getFullYear()} {ownerName}</p>
+      <p>{sharedSettings.location}</p>
       <p className="photography-footer__status">
         <span className="status-dot" aria-hidden="true" />
-        Available for work
+        {sharedSettings.availabilityLabel}
       </p>
     </footer>
   );
 }
 
-export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
+export function PhotographyExperience({
+  photos,
+  ownerName,
+  sharedSettings,
+}: PhotographyExperienceProps) {
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const reduceMotion = useReducedMotion();
@@ -174,7 +185,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
           </aside>
         </div>
 
-        <PhotographyFooter />
+        <PhotographyFooter ownerName={ownerName} sharedSettings={sharedSettings} />
       </motion.section>
     );
   }
@@ -198,7 +209,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
           </div>
 
           <div className="location-block photography-header__location">
-            <p>London, UK</p>
+            <p>{sharedSettings.location}</p>
             <p>
               Local time
               <LondonTime />
@@ -277,7 +288,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
         </section>
       </div>
 
-      <PhotographyFooter />
+      <PhotographyFooter ownerName={ownerName} sharedSettings={sharedSettings} />
     </>
   );
 }

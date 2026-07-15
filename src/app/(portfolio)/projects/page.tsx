@@ -6,11 +6,17 @@ import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
 import { projects } from "@/data/projects";
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 import { ProjectsFilter } from "./projects-filter";
 
-export const metadata: Metadata = createPageMetadata(pageSeo.projects);
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return createPageMetadata(pageSeo.projects, settings);
+}
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const settings = await getSiteSettings();
+
   return (
     <SiteContainer>
       <InitialRevealHeader className="projects-page-header">
@@ -35,7 +41,7 @@ export default function ProjectsPage() {
         <div>
           <p className="availability">
             <span className="status-dot" aria-hidden="true" />
-            Open to new opportunities
+            {settings.availabilityLabel}
           </p>
           <Link href="/#contact">
             Let&apos;s build something useful

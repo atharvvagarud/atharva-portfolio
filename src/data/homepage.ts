@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/site";
+import { siteOwnerName } from "@/config/site";
 
 export type HomepageProject = {
   index: string;
@@ -9,12 +9,6 @@ export type HomepageProject = {
   href: string;
 };
 
-export type HomepageLink = {
-  label: string;
-  href: string;
-  external?: boolean;
-};
-
 export type OffScreenImage = {
   src: string;
   alt: string;
@@ -23,11 +17,8 @@ export type OffScreenImage = {
 };
 
 export type HomepageData = {
-  availability: string;
   name: string;
-  location: string;
   introduction: readonly [string, string];
-  socialLinks: readonly HomepageLink[];
   projects: readonly HomepageProject[];
   profile: string;
   highlights: readonly { value: string; label: string }[];
@@ -35,27 +26,12 @@ export type HomepageData = {
   offScreenImages: readonly OffScreenImage[];
 };
 
-const socialLinks: HomepageLink[] = [
-  ...(siteConfig.githubUrl
-    ? [{ label: "GitHub", href: siteConfig.githubUrl, external: true }]
-    : []),
-  ...(siteConfig.linkedinUrl
-    ? [{ label: "LinkedIn", href: siteConfig.linkedinUrl, external: true }]
-    : []),
-  ...(siteConfig.email
-    ? [{ label: "Email", href: `mailto:${siteConfig.email}` }]
-    : []),
-];
-
 export const homepageData = {
-  availability: "Available for new graduate roles",
-  name: siteConfig.name,
-  location: siteConfig.location,
+  name: siteOwnerName,
   introduction: [
     "I build thoughtful software across full-stack systems, data and applied AI.",
     "First-Class Computer Science graduate creating products that are technically strong, visually considered and genuinely useful.",
   ],
-  socialLinks,
   projects: [
     {
       index: "01",

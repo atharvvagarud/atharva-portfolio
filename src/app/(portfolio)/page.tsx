@@ -5,11 +5,26 @@ import Link from "next/link";
 import { LondonTime } from "@/components/london-time";
 import { HeroReveal, RevealArticle, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
-import { pageSeo, siteConfig } from "@/config/site";
+import { pageSeo } from "@/config/site";
 import { homepageData } from "@/data/homepage";
 import { createPageMetadata } from "@/lib/seo";
+import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
+import { getSiteSettings } from "@/sanity/lib/get-site-settings";
+import type { SiteSettings } from "@/types/site-settings";
 
-export const metadata: Metadata = createPageMetadata(pageSeo.home);
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return createPageMetadata(
+    {
+      ...pageSeo.home,
+      title: settings.defaultSeoTitle,
+      description: settings.defaultSeoDescription,
+      image: settings.defaultOpenGraphImage.url,
+    },
+    settings,
+  );
+}
 
 function SectionLabel({
   id,
@@ -33,11 +48,7 @@ function SocialLink({
   label,
   href,
   external,
-}: {
-  label: string;
-  href: string;
-  external?: boolean;
-}) {
+}: SiteLink) {
   return (
     <Link
       className="text-link home-social-link"
@@ -52,14 +63,20 @@ function SocialLink({
   );
 }
 
-function Hero() {
+function Hero({
+  settings,
+  socialLinks,
+}: {
+  settings: SiteSettings;
+  socialLinks: readonly SiteLink[];
+}) {
   const [firstName, ...remainingName] = homepageData.name.split(" ");
 
   return (
     <HeroReveal className="home-hero" aria-labelledby="home-title">
       <p className="availability">
         <span className="status-dot" aria-hidden="true" />
-        {homepageData.availability}
+        {settings.availabilityLabel}
       </p>
 
       <div className="home-hero__title-row">
@@ -69,7 +86,7 @@ function Hero() {
         </h1>
 
         <aside className="location-block" aria-label="Location and local time">
-          <p>{homepageData.location}</p>
+          <p>{settings.location}</p>
           <p>
             <span>Local time</span>
             <LondonTime />
@@ -89,9 +106,9 @@ function Hero() {
           <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />
         </Link>
 
-        {homepageData.socialLinks.length > 0 ? (
+        {socialLinks.length > 0 ? (
           <div className="home-socials" aria-label="Social links">
-            {homepageData.socialLinks.map((link) => (
+            {socialLinks.map((link) => (
               <SocialLink key={link.label} {...link} />
             ))}
           </div>
@@ -184,24 +201,30 @@ function OffScreen() {
   );
 }
 
-function ContactFooter() {
+function ContactFooter({
+  settings,
+  socialLinks,
+}: {
+  settings: SiteSettings;
+  socialLinks: readonly SiteLink[];
+}) {
   return (
     <footer id="contact" className="contact-footer">
       <div className="contact-footer__lead">
-        <p>Have an opportunity or interesting project?</p>
-        {siteConfig.email ? (
-          <Link href={`mailto:${siteConfig.email}`}>
+        <p>{settings.footerMessage}</p>
+        {settings.email ? (
+          <Link href={`mailto:${settings.email}`}>
             Let&apos;s talk
             <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
           </Link>
         ) : null}
       </div>
 
-      <p className="contact-footer__location">{homepageData.location}</p>
+      <p className="contact-footer__location">{settings.location}</p>
 
-      {homepageData.socialLinks.length > 0 ? (
+      {socialLinks.length > 0 ? (
         <nav className="contact-footer__links" aria-label="Contact links">
-          {homepageData.socialLinks.map((link) => (
+          {socialLinks.map((link) => (
             <SocialLink key={link.label} {...link} />
           ))}
         </nav>
@@ -210,15 +233,18 @@ function ContactFooter() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getSiteSettings();
+  const socialLinks = getSiteContactLinks(settings);
+
   return (
     <SiteContainer>
-      <Hero />
+      <Hero settings={settings} socialLinks={socialLinks} />
       <hr className="divider" />
       <SelectedWork />
       <ProfileAndCurrently />
       <OffScreen />
-      <ContactFooter />
+      <ContactFooter settings={settings} socialLinks={socialLinks} />
     </SiteContainer>
   );
 }
