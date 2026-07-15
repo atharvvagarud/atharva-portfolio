@@ -49,6 +49,12 @@ body {
   line-height: 1.5;
 }
 
+.sanity-studio-shell {
+  min-height: 100dvh;
+  isolation: isolate;
+  background: #fff;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
