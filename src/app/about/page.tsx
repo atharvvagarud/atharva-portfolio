@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
+import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
 import { aboutData, type AboutLink } from "@/data/about";
@@ -38,7 +39,7 @@ export default function AboutPage() {
   return (
     <SiteContainer>
       <article className="about-page">
-        <header className="about-hero">
+        <InitialRevealHeader className="about-hero">
           <div className="about-hero__copy">
             <SectionLabel number="01">About</SectionLabel>
             <h1>{aboutData.introduction}</h1>
@@ -56,9 +57,9 @@ export default function AboutPage() {
               unoptimized
             />
           </figure>
-        </header>
+        </InitialRevealHeader>
 
-        <section className="about-background" aria-labelledby="about-background-title">
+        <SectionReveal className="about-background" aria-labelledby="about-background-title">
           <div className="about-background__biography">
             <SectionLabel number="02">Background</SectionLabel>
             <h2 id="about-background-title">Thoughtful products, built end to end.</h2>
@@ -90,9 +91,9 @@ export default function AboutPage() {
               </div>
             </dl>
           </aside>
-        </section>
+        </SectionReveal>
 
-        <section className="about-build" aria-labelledby="about-build-title">
+        <SectionReveal className="about-build" aria-labelledby="about-build-title">
           <div className="about-section-heading">
             <SectionLabel number="03">What I build</SectionLabel>
             <h2 id="about-build-title">From product idea to working software.</h2>
@@ -106,9 +107,9 @@ export default function AboutPage() {
               </li>
             ))}
           </ol>
-        </section>
+        </SectionReveal>
 
-        <section className="about-capabilities" aria-labelledby="capabilities-title">
+        <SectionReveal className="about-capabilities" aria-labelledby="capabilities-title">
           <div className="about-section-heading">
             <SectionLabel number="04">Capabilities</SectionLabel>
             <h2 id="capabilities-title">Selected tools and areas of practice.</h2>
@@ -119,9 +120,9 @@ export default function AboutPage() {
               <li key={capability}>{capability}</li>
             ))}
           </ul>
-        </section>
+        </SectionReveal>
 
-        <section className="about-now" aria-labelledby="about-now-title">
+        <SectionReveal className="about-now" aria-labelledby="about-now-title">
           <div className="about-now__focus">
             <SectionLabel number="05">Current focus</SectionLabel>
             <h2 id="about-now-title">Learning through building.</h2>
@@ -156,7 +157,7 @@ export default function AboutPage() {
               <Download aria-hidden="true" size={17} strokeWidth={1.5} />
             </a>
           </aside>
-        </section>
+        </SectionReveal>
       </article>
 
       <footer className="about-contact" id="contact">

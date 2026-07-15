@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { LondonTime } from "@/components/london-time";
 import { siteConfig } from "@/config/site";
 import {
@@ -31,6 +32,7 @@ function PhotographyFooter() {
 export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const reduceMotion = useReducedMotion();
   const lastSelectedId = useRef<string | null>(null);
   const viewerHeading = useRef<HTMLHeadingElement | null>(null);
   const viewerWasOpen = useRef(false);
@@ -106,7 +108,13 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
     const totalNumber = String(visiblePhotos.length).padStart(2, "0");
 
     return (
-      <section className="photo-viewer" aria-labelledby="photo-viewer-title">
+      <motion.section
+        className="photo-viewer"
+        aria-labelledby="photo-viewer-title"
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: reduceMotion ? 0 : 0.24 }}
+      >
         <div className="photo-viewer__layout">
           <figure className="photo-viewer__figure">
             <Image
@@ -171,14 +179,19 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
         </div>
 
         <PhotographyFooter />
-      </section>
+      </motion.section>
     );
   }
 
   return (
     <>
       <div className="photography-page">
-        <header className="photography-header">
+        <motion.header
+          className="photography-header"
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="photography-header__copy">
             <p className="section-label">01 / Photography</p>
             <h1>A quiet collection of places, moments and observations.</h1>
@@ -195,9 +208,16 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
               <LondonTime />
             </p>
           </div>
-        </header>
+        </motion.header>
 
-        <section className="photography-index" aria-labelledby="photography-index-title">
+        <motion.section
+          className="photography-index"
+          aria-labelledby="photography-index-title"
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.12 }}
+          transition={{ duration: reduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
+        >
           <h2 className="sr-only" id="photography-index-title">
             Photography index
           </h2>
@@ -226,8 +246,8 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
           </p>
 
           <div className="photo-grid" id="photography-grid">
-            {visiblePhotos.map((photo) => (
-              <button
+            {visiblePhotos.map((photo, index) => (
+              <motion.button
                 className="photo-tile"
                 type="button"
                 key={photo.id}
@@ -236,6 +256,14 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
                 }}
                 aria-label={`View ${photo.title}, ${photo.location}`}
                 onClick={() => openPhoto(photo.id)}
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.16 }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.38,
+                  delay: reduceMotion ? 0 : Math.min(index * 0.035, 0.18),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
                 <span className="photo-tile__image-wrap">
                   <Image
@@ -251,10 +279,10 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
                   <span>{photo.title}</span>
                   <span>{photo.location}</span>
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </section>
+        </motion.section>
       </div>
 
       <PhotographyFooter />

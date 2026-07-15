@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { LondonTime } from "@/components/london-time";
+import { HeroReveal, RevealArticle, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo, siteConfig } from "@/config/site";
 import { homepageData } from "@/data/homepage";
@@ -55,7 +56,7 @@ function Hero() {
   const [firstName, ...remainingName] = homepageData.name.split(" ");
 
   return (
-    <section className="home-hero" aria-labelledby="home-title">
+    <HeroReveal className="home-hero" aria-labelledby="home-title">
       <p className="availability">
         <span className="status-dot" aria-hidden="true" />
         {homepageData.availability}
@@ -94,18 +95,18 @@ function Hero() {
           ))}
         </div>
       </div>
-    </section>
+    </HeroReveal>
   );
 }
 
 function SelectedWork() {
   return (
-    <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
+    <SectionReveal id="selected-work" className="home-section" aria-labelledby="selected-work-title">
       <SectionLabel id="selected-work-title" number="01">Selected work</SectionLabel>
 
       <div className="project-list">
-        {homepageData.projects.map((project) => (
-          <article className="project-row" key={project.index}>
+        {homepageData.projects.map((project, index) => (
+          <RevealArticle className="project-row" delay={index * 0.05} key={project.index}>
             <p className="project-row__index">{project.index}</p>
             <div className="project-row__title-wrap">
               <h3 className="project-row__title">{project.title}</h3>
@@ -125,16 +126,16 @@ function SelectedWork() {
             <Link className="project-row__link" href={project.href} aria-label={`View ${project.title}`}>
               <ArrowRight aria-hidden="true" size={22} strokeWidth={1.4} />
             </Link>
-          </article>
+          </RevealArticle>
         ))}
       </div>
-    </section>
+    </SectionReveal>
   );
 }
 
 function ProfileAndCurrently() {
   return (
-    <section className="profile-currently" aria-label="Profile and current interests">
+    <SectionReveal className="profile-currently" aria-label="Profile and current interests">
       <div className="profile-block">
         <SectionLabel number="02">Profile</SectionLabel>
         <p className="profile-copy">{homepageData.profile}</p>
@@ -159,13 +160,13 @@ function ProfileAndCurrently() {
           ))}
         </dl>
       </div>
-    </section>
+    </SectionReveal>
   );
 }
 
 function OffScreen() {
   return (
-    <section className="home-section off-screen" aria-labelledby="off-screen-title">
+    <SectionReveal className="home-section off-screen" aria-labelledby="off-screen-title">
       <SectionLabel id="off-screen-title" number="04">Off screen</SectionLabel>
       <div className="off-screen-grid">
         {homepageData.offScreenImages.map((image) => (
@@ -182,7 +183,7 @@ function OffScreen() {
           </figure>
         ))}
       </div>
-    </section>
+    </SectionReveal>
   );
 }
 

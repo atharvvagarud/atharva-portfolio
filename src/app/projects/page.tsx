@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
 import { projects } from "@/data/projects";
@@ -12,7 +13,7 @@ export const metadata: Metadata = createPageMetadata(pageSeo.projects);
 export default function ProjectsPage() {
   return (
     <SiteContainer>
-      <header className="projects-page-header">
+      <InitialRevealHeader className="projects-page-header">
         <div className="projects-page-header__copy">
           <p className="availability">
             <span className="status-dot" aria-hidden="true" />
@@ -24,11 +25,11 @@ export default function ProjectsPage() {
             full-stack systems, data and applied AI.
           </p>
         </div>
-      </header>
+      </InitialRevealHeader>
 
-      <section className="projects-index" aria-label="Project index">
+      <SectionReveal className="projects-index" aria-label="Project index">
         <ProjectsFilter projects={projects} />
-      </section>
+      </SectionReveal>
 
       <footer className="projects-page-footer">
         <div>

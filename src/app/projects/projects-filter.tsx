@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
 import {
   projectCategories,
@@ -11,9 +12,11 @@ import {
 } from "@/data/projects";
 
 const filters: readonly ProjectFilter[] = ["All", ...projectCategories];
+const MotionLink = motion.create(Link);
 
 export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
   const [activeFilter, setActiveFilter] = useState<ProjectFilter>("All");
+  const reduceMotion = useReducedMotion();
 
   const filteredProjects = useMemo(
     () =>
@@ -45,13 +48,21 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
       </p>
 
       <div className="projects-index-list">
-        {filteredProjects.map((project) => (
-          <Link
+        {filteredProjects.map((project, index) => (
+          <MotionLink
             className="projects-index-row"
             href={project.href}
             id={project.id}
             key={project.id}
             aria-label={`View ${project.title} project summary`}
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.18 }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.42,
+              delay: reduceMotion ? 0 : index * 0.05,
+              ease: [0.16, 1, 0.3, 1],
+            }}
           >
             <span className="projects-index-row__number">{project.index}</span>
 
@@ -90,7 +101,7 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
             <span className="projects-index-row__arrow" aria-hidden="true">
               <ArrowRight size={23} strokeWidth={1.4} />
             </span>
-          </Link>
+          </MotionLink>
         ))}
       </div>
     </>
