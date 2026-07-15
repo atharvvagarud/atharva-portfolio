@@ -3,13 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { SiteContainer } from "@/components/site-container";
+import { pageSeo } from "@/config/site";
 import { aboutData, type AboutLink } from "@/data/about";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "About Atharva Garud, a First-Class Computer Science graduate and software engineer based in London.",
-};
+export const metadata: Metadata = createPageMetadata(pageSeo.about);
 
 function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
   return (

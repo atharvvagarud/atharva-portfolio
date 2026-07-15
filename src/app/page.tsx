@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { LondonTime } from "@/components/london-time";
 import { SiteContainer } from "@/components/site-container";
+import { pageSeo, siteConfig } from "@/config/site";
 import { homepageData } from "@/data/homepage";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata(pageSeo.home);
 
 function SectionLabel({
   id,
@@ -47,6 +52,8 @@ function SocialLink({
 }
 
 function Hero() {
+  const [firstName, ...remainingName] = homepageData.name.split(" ");
+
   return (
     <section className="home-hero" aria-labelledby="home-title">
       <p className="availability">
@@ -56,8 +63,8 @@ function Hero() {
 
       <div className="home-hero__title-row">
         <h1 id="home-title" className="home-title">
-          <span>{homepageData.name[0]}</span>
-          <span>{homepageData.name[1]}</span>
+          <span>{firstName}</span>
+          <span>{remainingName.join(" ")}</span>
         </h1>
 
         <aside className="location-block" aria-label="Location and local time">
@@ -184,7 +191,7 @@ function ContactFooter() {
     <footer id="contact" className="contact-footer">
       <div className="contact-footer__lead">
         <p>Have an opportunity or interesting project?</p>
-        <Link href="mailto:atharva@example.com">
+        <Link href={`mailto:${siteConfig.email}`}>
           Let&apos;s talk
           <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
         </Link>

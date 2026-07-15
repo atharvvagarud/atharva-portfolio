@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site";
+
 export type AboutLink = {
   label: string;
   href: string;
@@ -84,23 +86,23 @@ export const aboutData = {
     "Exploring AI agents and local models",
     "Looking for graduate software-engineering opportunities",
   ],
-  location: "London, UK",
+  location: siteConfig.location,
   availability: "Open to graduate software-engineering opportunities",
   links: [
     {
       label: "Email",
-      href: "mailto:atharva@example.com",
+      href: `mailto:${siteConfig.email}`,
       placeholder: true,
     },
     {
       label: "LinkedIn",
-      href: "https://www.linkedin.com/",
+      href: siteConfig.linkedinUrl,
       external: true,
       placeholder: true,
     },
     {
       label: "GitHub",
-      href: "https://github.com/",
+      href: siteConfig.githubUrl,
       external: true,
       placeholder: true,
     },

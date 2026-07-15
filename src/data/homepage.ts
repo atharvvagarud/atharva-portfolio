@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site";
+
 export type HomepageProject = {
   index: string;
   title: string;
@@ -24,7 +26,7 @@ export type OffScreenImage = {
 
 export type HomepageData = {
   availability: string;
-  name: readonly [string, string];
+  name: string;
   location: string;
   introduction: readonly [string, string];
   socialLinks: readonly HomepageLink[];
@@ -37,8 +39,8 @@ export type HomepageData = {
 
 export const homepageData = {
   availability: "Available for new graduate roles",
-  name: ["Atharva", "Garud"],
-  location: "London, UK",
+  name: siteConfig.name,
+  location: siteConfig.location,
   introduction: [
     "I build thoughtful software across full-stack systems, data and applied AI.",
     "First-Class Computer Science graduate creating products that are technically strong, visually considered and genuinely useful.",
@@ -46,17 +48,17 @@ export const homepageData = {
   socialLinks: [
     {
       label: "GitHub",
-      href: "https://github.com/",
+      href: siteConfig.githubUrl,
       external: true,
       placeholder: true,
     },
     {
       label: "LinkedIn",
-      href: "https://www.linkedin.com/",
+      href: siteConfig.linkedinUrl,
       external: true,
       placeholder: true,
     },
-    { label: "Email", href: "mailto:atharva@example.com", placeholder: true },
+    { label: "Email", href: `mailto:${siteConfig.email}`, placeholder: true },
   ],
   projects: [
     {

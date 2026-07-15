@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SiteContainer } from "@/components/site-container";
+import { pageSeo } from "@/config/site";
 import { projects } from "@/data/projects";
+import { createPageMetadata } from "@/lib/seo";
 import { ProjectsFilter } from "./projects-filter";
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description:
-    "Selected software engineering projects by Atharva Garud across full-stack systems, data and applied AI.",
-};
+export const metadata: Metadata = createPageMetadata(pageSeo.projects);
 
 export default function ProjectsPage() {
   return (

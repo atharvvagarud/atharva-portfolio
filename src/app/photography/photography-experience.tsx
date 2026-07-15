@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { LondonTime } from "@/components/london-time";
+import { siteConfig } from "@/config/site";
 import {
   photoFilters,
   type Photo,
@@ -17,8 +18,8 @@ type PhotographyExperienceProps = {
 function PhotographyFooter() {
   return (
     <footer className="photography-footer">
-      <p>© {new Date().getFullYear()} Atharva Garud</p>
-      <p>London, UK</p>
+      <p>© {new Date().getFullYear()} {siteConfig.name}</p>
+      <p>{siteConfig.location}</p>
       <p className="photography-footer__status">
         <span className="status-dot" aria-hidden="true" />
         Available for work
