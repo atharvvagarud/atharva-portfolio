@@ -149,3 +149,15 @@ Before implementing a task:
 6. Report what changed and any remaining limitations.
 
 Prefer several small, reviewable changes over one large rewrite.
+
+## Future CMS compatibility
+
+All editable content must remain separate from presentation components.
+
+Pages and components should consume typed content through props or data-access functions.
+
+Do not hardcode editable copy, project records, photo metadata, social links, availability text or asset paths deep inside presentation components.
+
+Maintain a clear data-access layer so the current static TypeScript content can later be replaced with Payload CMS without redesigning page components.
+
+Stable visual structure may remain in components, but user-editable content must be centralised.
