@@ -36,7 +36,6 @@ html {
   min-width: 20rem;
   background: var(--color-background);
   color: var(--color-foreground);
-  scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
 }
 

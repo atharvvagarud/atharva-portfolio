@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { SiteHeader } from "@/components/site-header";
 import { pageSeo, siteConfig } from "@/config/site";
 import "./globals.css";
@@ -114,17 +115,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
-          }}
-        />
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main-content">{children}</main>
+        <SmoothScrollProvider>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+            }}
+          />
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main-content">{children}</main>
+        </SmoothScrollProvider>
       </body>
     </html>
   );
