@@ -1,65 +1,206 @@
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { LondonTime } from "@/components/london-time";
+import { SiteContainer } from "@/components/site-container";
+import { homepageData } from "@/data/homepage";
+
+function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
+  return (
+    <h2 className="section-label">
+      <span>{number}</span>
+      <span aria-hidden="true">/</span>
+      <span>{children}</span>
+    </h2>
+  );
+}
+
+function SocialLink({
+  label,
+  href,
+  external,
+}: {
+  label: string;
+  href: string;
+  external?: boolean;
+}) {
+  return (
+    <Link
+      className="text-link home-social-link"
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+    >
+      {label}
+      <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.5} />
+    </Link>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="home-hero" aria-labelledby="home-title">
+      <p className="availability">
+        <span className="status-dot" aria-hidden="true" />
+        {homepageData.availability}
+      </p>
+
+      <div className="home-hero__title-row">
+        <h1 id="home-title" className="home-title">
+          <span>{homepageData.name[0]}</span>
+          <span>{homepageData.name[1]}</span>
+        </h1>
+
+        <aside className="location-block" aria-label="Location and local time">
+          <p>{homepageData.location}</p>
+          <p>
+            <span>Local time</span>
+            <LondonTime />
+          </p>
+        </aside>
+      </div>
+
+      <div className="home-introduction">
+        {homepageData.introduction.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      </div>
+
+      <div className="home-actions">
+        <Link className="button-primary home-work-button" href="#selected-work">
+          View selected work
+          <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />
+        </Link>
+
+        <div className="home-socials" aria-label="Social links">
+          {homepageData.socialLinks.map((link) => (
+            <SocialLink key={link.label} {...link} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SelectedWork() {
+  return (
+    <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
+      <SectionLabel number="01">Selected work</SectionLabel>
+
+      <div className="project-list">
+        {homepageData.projects.map((project) => (
+          <article className="project-row" key={project.index}>
+            <p className="project-row__index">{project.index}</p>
+            <div className="project-row__title-wrap">
+              <h3 className="project-row__title">{project.title}</h3>
+              {"placeholder" in project && project.placeholder ? (
+                <span className="project-placeholder">Placeholder</span>
+              ) : null}
+            </div>
+            <div className="project-row__summary">
+              <p>{project.description}</p>
+              <ul aria-label={`${project.title} technologies`}>
+                {project.technologies.map((technology) => (
+                  <li key={technology}>{technology}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="project-row__year">{project.year}</p>
+            <Link className="project-row__link" href={project.href} aria-label={`View ${project.title}`}>
+              <ArrowRight aria-hidden="true" size={22} strokeWidth={1.4} />
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProfileAndCurrently() {
+  return (
+    <section className="profile-currently" aria-label="Profile and current interests">
+      <div className="profile-block">
+        <SectionLabel number="02">Profile</SectionLabel>
+        <p className="profile-copy">{homepageData.profile}</p>
+        <dl className="profile-highlights">
+          {homepageData.highlights.map((highlight) => (
+            <div key={highlight.label}>
+              <dt>{highlight.value}</dt>
+              <dd>{highlight.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div className="currently-block">
+        <SectionLabel number="03">Currently</SectionLabel>
+        <dl className="currently-list">
+          {homepageData.currently.map((item) => (
+            <div key={item.label}>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
+function OffScreen() {
+  return (
+    <section className="home-section off-screen" aria-labelledby="off-screen-title">
+      <SectionLabel number="04">Off screen</SectionLabel>
+      <div className="off-screen-grid">
+        {homepageData.offScreenImages.map((image) => (
+          <figure key={image.src}>
+            <Image
+              src={image.src}
+              alt={image.alt}
+              width={image.width}
+              height={image.height}
+              loading="eager"
+              unoptimized
+              sizes="(max-width: 639px) 44vw, (max-width: 1023px) 22vw, 23vw"
+            />
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ContactFooter() {
+  return (
+    <footer id="contact" className="contact-footer">
+      <div className="contact-footer__lead">
+        <p>Have an opportunity or interesting project?</p>
+        <Link href="mailto:atharva@example.com">
+          Let&apos;s talk
+          <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
+        </Link>
+      </div>
+
+      <p className="contact-footer__location">{homepageData.location}</p>
+
+      <nav className="contact-footer__links" aria-label="Contact links">
+        {homepageData.socialLinks.map((link) => (
+          <SocialLink key={link.label} {...link} />
+        ))}
+      </nav>
+    </footer>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <SiteContainer>
+      <Hero />
+      <hr className="divider" />
+      <SelectedWork />
+      <ProfileAndCurrently />
+      <OffScreen />
+      <ContactFooter />
+    </SiteContainer>
   );
 }
