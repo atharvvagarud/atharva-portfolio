@@ -31,6 +31,8 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const lastSelectedId = useRef<string | null>(null);
+  const viewerHeading = useRef<HTMLHeadingElement | null>(null);
+  const viewerWasOpen = useRef(false);
   const photoButtons = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const visiblePhotos = useMemo(
@@ -71,12 +73,27 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
   );
 
   useEffect(() => {
-    if (!activePhoto) return;
+    if (!activePhoto) {
+      viewerWasOpen.current = false;
+      return;
+    }
+
+    if (!viewerWasOpen.current) {
+      viewerWasOpen.current = true;
+      window.requestAnimationFrame(() => viewerHeading.current?.focus());
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeViewer();
-      if (event.key === "ArrowLeft") navigate(-1);
-      if (event.key === "ArrowRight") navigate(1);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeViewer();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        navigate(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        navigate(1);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -106,7 +123,9 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
             <p className="section-label">02 / View</p>
 
             <div className="photo-viewer__introduction">
-              <h1 id="photo-viewer-title">{activePhoto.title}</h1>
+              <h1 ref={viewerHeading} id="photo-viewer-title" tabIndex={-1}>
+                {activePhoto.title}
+              </h1>
               <p>{activePhoto.summary}</p>
             </div>
 
@@ -182,13 +201,14 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
             Photography index
           </h2>
 
-          <div className="photo-filters" aria-label="Filter photographs">
+          <div className="photo-filters" role="group" aria-label="Filter photographs">
             {photoFilters.map((filter) => (
               <button
                 className="photo-filter"
                 type="button"
                 key={filter}
                 aria-pressed={activeFilter === filter}
+                aria-controls="photography-grid"
                 onClick={() => setActiveFilter(filter)}
               >
                 <span
@@ -200,7 +220,11 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
             ))}
           </div>
 
-          <div className="photo-grid">
+          <p className="sr-only" aria-live="polite">
+            {visiblePhotos.length} {visiblePhotos.length === 1 ? "photograph" : "photographs"} shown
+          </p>
+
+          <div className="photo-grid" id="photography-grid">
             {visiblePhotos.map((photo) => (
               <button
                 className="photo-tile"
@@ -209,7 +233,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
                 ref={(element) => {
                   photoButtons.current[photo.id] = element;
                 }}
-                aria-label={`View ${photo.title}`}
+                aria-label={`View ${photo.title}, ${photo.location}`}
                 onClick={() => openPhoto(photo.id)}
               >
                 <span className="photo-tile__image-wrap">

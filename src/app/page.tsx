@@ -5,9 +5,17 @@ import { LondonTime } from "@/components/london-time";
 import { SiteContainer } from "@/components/site-container";
 import { homepageData } from "@/data/homepage";
 
-function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
+function SectionLabel({
+  id,
+  number,
+  children,
+}: {
+  id?: string;
+  number: string;
+  children: React.ReactNode;
+}) {
   return (
-    <h2 className="section-label">
+    <h2 className="section-label" id={id}>
       <span>{number}</span>
       <span aria-hidden="true">/</span>
       <span>{children}</span>
@@ -29,7 +37,8 @@ function SocialLink({
       className="text-link home-social-link"
       href={href}
       target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      aria-label={external ? `${label}, opens in a new tab` : undefined}
     >
       {label}
       <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.5} />
@@ -85,7 +94,7 @@ function Hero() {
 function SelectedWork() {
   return (
     <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
-      <SectionLabel number="01">Selected work</SectionLabel>
+      <SectionLabel id="selected-work-title" number="01">Selected work</SectionLabel>
 
       <div className="project-list">
         {homepageData.projects.map((project) => (
@@ -150,7 +159,7 @@ function ProfileAndCurrently() {
 function OffScreen() {
   return (
     <section className="home-section off-screen" aria-labelledby="off-screen-title">
-      <SectionLabel number="04">Off screen</SectionLabel>
+      <SectionLabel id="off-screen-title" number="04">Off screen</SectionLabel>
       <div className="off-screen-grid">
         {homepageData.offScreenImages.map((image) => (
           <figure key={image.src}>

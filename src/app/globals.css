@@ -165,10 +165,17 @@ summary {
   text-decoration: none;
 }
 
+.site-nav__link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
 .site-nav__link::after {
   position: absolute;
   right: 0;
-  bottom: -0.45rem;
+  bottom: 0.45rem;
   left: 0;
   height: 1px;
   content: "";
@@ -822,34 +829,20 @@ summary {
     display: block;
   }
 
-  .mobile-menu > summary {
+  .mobile-menu__trigger {
     display: flex;
     min-width: 2.75rem;
     min-height: 2.75rem;
     align-items: center;
     justify-content: flex-end;
     cursor: pointer;
+    border: 0;
+    background: transparent;
+    color: inherit;
     font-family: var(--font-geist-mono), monospace;
     font-size: 0.75rem;
     line-height: 1;
-    list-style: none;
     text-transform: uppercase;
-  }
-
-  .mobile-menu > summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .mobile-menu__close-label {
-    display: none;
-  }
-
-  .mobile-menu[open] .mobile-menu__open-label {
-    display: none;
-  }
-
-  .mobile-menu[open] .mobile-menu__close-label {
-    display: inline;
   }
 
   .mobile-menu__panel {
@@ -1022,6 +1015,7 @@ summary {
 }
 
 .projects-index-row__title {
+  margin: 0;
   font-size: clamp(1.25rem, 2.2vw, 2rem);
   font-weight: 560;
   line-height: 1.08;

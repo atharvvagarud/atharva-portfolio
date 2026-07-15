@@ -70,7 +70,7 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
 
             <span className="projects-index-row__content">
               <span className="projects-index-row__title-line">
-                <span className="projects-index-row__title">{project.title}</span>
+                <h2 className="projects-index-row__title">{project.title}</h2>
                 {project.placeholder ? (
                   <span className="projects-index-row__placeholder">Placeholder</span>
                 ) : null}

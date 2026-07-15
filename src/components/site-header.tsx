@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { MobileMenu } from "@/components/mobile-menu";
 import { SiteContainer } from "@/components/site-container";
 
 const navigation = [
@@ -32,32 +33,7 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <details className="mobile-menu">
-          <summary>
-            <span className="mobile-menu__open-label">Menu</span>
-            <span className="mobile-menu__close-label">Close</span>
-          </summary>
-          <div className="mobile-menu__panel">
-            <SiteContainer>
-              <nav aria-label="Mobile navigation">
-                <ul className="mobile-menu__links">
-                  {navigation.map((item) => (
-                    <li key={item.href}>
-                      <Link className="mobile-menu__link" href={item.href}>
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                  <li>
-                    <Link className="mobile-menu__link" href="/#contact">
-                      Get in touch
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-            </SiteContainer>
-          </div>
-        </details>
+        <MobileMenu items={navigation} />
       </SiteContainer>
     </header>
   );
