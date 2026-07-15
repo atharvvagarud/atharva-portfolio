@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
+import { InitialRevealHeader } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
 import { projects } from "@/data/projects";
@@ -27,9 +27,9 @@ export default function ProjectsPage() {
         </div>
       </InitialRevealHeader>
 
-      <SectionReveal className="projects-index" aria-label="Project index">
+      <section className="projects-index" aria-label="Project index">
         <ProjectsFilter projects={projects} />
-      </SectionReveal>
+      </section>
 
       <footer className="projects-page-footer">
         <div>

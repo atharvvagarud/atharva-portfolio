@@ -101,7 +101,7 @@ function Hero() {
 
 function SelectedWork() {
   return (
-    <SectionReveal id="selected-work" className="home-section" aria-labelledby="selected-work-title">
+    <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
       <SectionLabel id="selected-work-title" number="01">Selected work</SectionLabel>
 
       <div className="project-list">
@@ -129,7 +129,7 @@ function SelectedWork() {
           </RevealArticle>
         ))}
       </div>
-    </SectionReveal>
+    </section>
   );
 }
 
@@ -176,9 +176,7 @@ function OffScreen() {
               alt={image.alt}
               width={image.width}
               height={image.height}
-              loading="eager"
-              unoptimized
-              sizes="(max-width: 639px) 44vw, (max-width: 1023px) 22vw, 23vw"
+              sizes="(max-width: 639px) calc((100vw - 3.75rem) / 2), (max-width: 1023px) calc((100vw - 7.5rem) / 4), 23vw"
             />
           </figure>
         ))}

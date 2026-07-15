@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
@@ -38,13 +38,10 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
   const viewerWasOpen = useRef(false);
   const photoButtons = useRef<Record<string, HTMLButtonElement | null>>({});
 
-  const visiblePhotos = useMemo(
-    () =>
-      activeFilter === "All"
-        ? photos
-        : photos.filter((photo) => photo.category === activeFilter),
-    [activeFilter, photos],
-  );
+  const visiblePhotos =
+    activeFilter === "All"
+      ? photos
+      : photos.filter((photo) => photo.category === activeFilter);
 
   const activeIndex = selectedId
     ? visiblePhotos.findIndex((photo) => photo.id === selectedId)
@@ -123,8 +120,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
               alt={activePhoto.alt}
               width={activePhoto.width}
               height={activePhoto.height}
-              sizes="(max-width: 767px) 100vw, 74vw"
-              priority
+              sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1599px) 74vw, 1184px"
             />
           </figure>
 
@@ -210,13 +206,9 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
           </div>
         </motion.header>
 
-        <motion.section
+        <section
           className="photography-index"
           aria-labelledby="photography-index-title"
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.12 }}
-          transition={{ duration: reduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
         >
           <h2 className="sr-only" id="photography-index-title">
             Photography index
@@ -272,7 +264,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
                     alt=""
                     width={photo.width}
                     height={photo.height}
-                    sizes="(max-width: 767px) 50vw, (max-width: 1199px) 25vw, 20vw"
+                    sizes="(max-width: 767px) calc((100vw - 3.5rem) / 2), (max-width: 1199px) calc((100vw - 6.5rem) / 3), (max-width: 1599px) 20vw, 320px"
                   />
                 </span>
                 <span className="photo-tile__caption">
@@ -282,7 +274,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
               </motion.button>
             ))}
           </div>
-        </motion.section>
+        </section>
       </div>
 
       <PhotographyFooter />

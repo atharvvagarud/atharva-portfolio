@@ -1,8 +1,13 @@
 "use client";
 
-import { ReactLenis } from "lenis/react";
+import dynamic from "next/dynamic";
 import "lenis/dist/lenis.css";
 import { useEffect, useState, type ReactNode } from "react";
+
+const ReactLenis = dynamic(
+  () => import("lenis/react").then((module) => module.ReactLenis),
+  { ssr: false },
+);
 
 const lenisOptions = {
   duration: 1,

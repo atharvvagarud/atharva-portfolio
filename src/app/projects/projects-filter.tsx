@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   projectCategories,
   type Project,
@@ -18,13 +18,10 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
   const [activeFilter, setActiveFilter] = useState<ProjectFilter>("All");
   const reduceMotion = useReducedMotion();
 
-  const filteredProjects = useMemo(
-    () =>
-      activeFilter === "All"
-        ? projects
-        : projects.filter((project) => project.categories.includes(activeFilter)),
-    [activeFilter, projects],
-  );
+  const filteredProjects =
+    activeFilter === "All"
+      ? projects
+      : projects.filter((project) => project.categories.includes(activeFilter));
 
   return (
     <>
@@ -73,9 +70,7 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
                 alt={project.preview.alt}
                 width={project.preview.width}
                 height={project.preview.height}
-                loading="eager"
-                unoptimized
-                sizes="(max-width: 767px) 100vw, (max-width: 1023px) 40vw, 28vw"
+                sizes="(max-width: 767px) calc(100vw - 5.75rem), (max-width: 1023px) 40vw, (max-width: 1599px) 28vw, 448px"
               />
             </span>
 

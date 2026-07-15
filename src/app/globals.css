@@ -890,6 +890,22 @@ summary {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .route-content {
+    animation: route-content-in 240ms ease-out both;
+  }
+}
+
+@keyframes route-content-in {
+  from {
+    opacity: 0.96;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* Projects index */
 .projects-page-header {
   display: grid;

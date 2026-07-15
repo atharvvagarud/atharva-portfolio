@@ -52,9 +52,8 @@ export default function AboutPage() {
               alt={aboutData.image.alt}
               width={aboutData.image.width}
               height={aboutData.image.height}
-              sizes="(max-width: 767px) 100vw, 41vw"
+              sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1599px) 41vw, 656px"
               priority
-              unoptimized
             />
           </figure>
         </InitialRevealHeader>
