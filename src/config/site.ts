@@ -4,13 +4,13 @@ export type SiteConfig = {
   readonly description: string;
   readonly location: string;
   readonly siteUrl: string;
-  readonly email: string;
-  readonly githubUrl: string;
-  readonly linkedinUrl: string;
+  readonly email: string | null;
+  readonly githubUrl: string | null;
+  readonly linkedinUrl: string | null;
 };
 
-const configuredSiteUrl =
-  process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
+const optionalValue = (value: string | undefined) => value?.trim() || null;
+const configuredSiteUrl = optionalValue(process.env.SITE_URL);
 
 export const siteConfig = {
   name: "Atharva Garud",
@@ -19,9 +19,9 @@ export const siteConfig = {
     "Portfolio of Atharva Garud, a First-Class Computer Science graduate and software engineer based in London.",
   location: "London, UK",
   siteUrl: (configuredSiteUrl || "https://atharvagarud.com").replace(/\/+$/, ""),
-  email: "atharva@example.com",
-  githubUrl: "https://github.com/",
-  linkedinUrl: "https://www.linkedin.com/",
+  email: optionalValue(process.env.SITE_EMAIL),
+  githubUrl: optionalValue(process.env.GITHUB_URL),
+  linkedinUrl: optionalValue(process.env.LINKEDIN_URL),
 } as const satisfies SiteConfig;
 
 export type PageSeo = {
@@ -31,6 +31,8 @@ export type PageSeo = {
   readonly image: `/${string}`;
   readonly imageAlt: string;
 };
+
+export type PageSeoInput = Pick<PageSeo, "path"> & Partial<Omit<PageSeo, "path">>;
 
 export const pageSeo = {
   home: {

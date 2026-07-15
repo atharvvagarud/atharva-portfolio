@@ -25,8 +25,6 @@ export type Photo = {
 
 export const photoFilters: readonly PhotoFilter[] = ["All", ...photoCategories];
 
-// Placeholder photographs and metadata: replace these records as the final
-// portfolio edit is supplied. Keeping both here makes future swaps mechanical.
 export const photos: readonly Photo[] = [
   {
     id: "photo-01",

@@ -4,8 +4,6 @@ export type AboutLink = {
   label: string;
   href: string;
   external?: boolean;
-  download?: boolean;
-  placeholder?: boolean;
 };
 
 export type AboutEducation = {
@@ -20,7 +18,10 @@ export type AboutImage = {
   alt: string;
   width: number;
   height: number;
-  placeholder: boolean;
+};
+
+export type AboutCv = AboutLink & {
+  available: boolean;
 };
 
 export type AboutData = {
@@ -35,19 +36,30 @@ export type AboutData = {
   location: string;
   availability: string;
   links: readonly AboutLink[];
-  cv: AboutLink;
+  cv: AboutCv;
 };
+
+const contactLinks: AboutLink[] = [
+  ...(siteConfig.email
+    ? [{ label: "Email", href: `mailto:${siteConfig.email}` }]
+    : []),
+  ...(siteConfig.linkedinUrl
+    ? [{ label: "LinkedIn", href: siteConfig.linkedinUrl, external: true }]
+    : []),
+  ...(siteConfig.githubUrl
+    ? [{ label: "GitHub", href: siteConfig.githubUrl, external: true }]
+    : []),
+];
 
 export const aboutData = {
   introduction: "Useful software, thoughtfully built.",
   introductionDetail:
     "I am Atharva Garud, a First-Class Computer Science graduate and software engineer based in London. I care about strong engineering, clear interfaces and thoughtful product decisions.",
   image: {
-    src: "/images/about-personal-placeholder.png",
+    src: "/images/about-sketchbook.png",
     alt: "An open sketchbook containing interface and product diagrams",
     width: 1000,
     height: 750,
-    placeholder: true,
   },
   biography: [
     "I enjoy working across the full product journey, from understanding a problem and shaping an interface to designing APIs, modelling data and deploying the finished system.",
@@ -88,28 +100,10 @@ export const aboutData = {
   ],
   location: siteConfig.location,
   availability: "Open to graduate software-engineering opportunities",
-  links: [
-    {
-      label: "Email",
-      href: `mailto:${siteConfig.email}`,
-      placeholder: true,
-    },
-    {
-      label: "LinkedIn",
-      href: siteConfig.linkedinUrl,
-      external: true,
-      placeholder: true,
-    },
-    {
-      label: "GitHub",
-      href: siteConfig.githubUrl,
-      external: true,
-      placeholder: true,
-    },
-  ],
+  links: contactLinks,
   cv: {
     label: "Download CV",
     href: "/resume/atharva-garud-cv.pdf",
-    download: true,
+    available: false,
   },
 } as const satisfies AboutData;

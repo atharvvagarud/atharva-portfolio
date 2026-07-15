@@ -89,11 +89,13 @@ function Hero() {
           <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />
         </Link>
 
-        <div className="home-socials" aria-label="Social links">
-          {homepageData.socialLinks.map((link) => (
-            <SocialLink key={link.label} {...link} />
-          ))}
-        </div>
+        {homepageData.socialLinks.length > 0 ? (
+          <div className="home-socials" aria-label="Social links">
+            {homepageData.socialLinks.map((link) => (
+              <SocialLink key={link.label} {...link} />
+            ))}
+          </div>
+        ) : null}
       </div>
     </HeroReveal>
   );
@@ -110,9 +112,6 @@ function SelectedWork() {
             <p className="project-row__index">{project.index}</p>
             <div className="project-row__title-wrap">
               <h3 className="project-row__title">{project.title}</h3>
-              {"placeholder" in project && project.placeholder ? (
-                <span className="project-placeholder">Placeholder</span>
-              ) : null}
             </div>
             <div className="project-row__summary">
               <p>{project.description}</p>
@@ -190,19 +189,23 @@ function ContactFooter() {
     <footer id="contact" className="contact-footer">
       <div className="contact-footer__lead">
         <p>Have an opportunity or interesting project?</p>
-        <Link href={`mailto:${siteConfig.email}`}>
-          Let&apos;s talk
-          <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
-        </Link>
+        {siteConfig.email ? (
+          <Link href={`mailto:${siteConfig.email}`}>
+            Let&apos;s talk
+            <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
+          </Link>
+        ) : null}
       </div>
 
       <p className="contact-footer__location">{homepageData.location}</p>
 
-      <nav className="contact-footer__links" aria-label="Contact links">
-        {homepageData.socialLinks.map((link) => (
-          <SocialLink key={link.label} {...link} />
-        ))}
-      </nav>
+      {homepageData.socialLinks.length > 0 ? (
+        <nav className="contact-footer__links" aria-label="Contact links">
+          {homepageData.socialLinks.map((link) => (
+            <SocialLink key={link.label} {...link} />
+          ))}
+        </nav>
+      ) : null}
     </footer>
   );
 }

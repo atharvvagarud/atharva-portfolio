@@ -7,14 +7,12 @@ export type HomepageProject = {
   technologies: readonly string[];
   year: string;
   href: string;
-  placeholder?: boolean;
 };
 
 export type HomepageLink = {
   label: string;
   href: string;
   external?: boolean;
-  placeholder?: boolean;
 };
 
 export type OffScreenImage = {
@@ -37,6 +35,18 @@ export type HomepageData = {
   offScreenImages: readonly OffScreenImage[];
 };
 
+const socialLinks: HomepageLink[] = [
+  ...(siteConfig.githubUrl
+    ? [{ label: "GitHub", href: siteConfig.githubUrl, external: true }]
+    : []),
+  ...(siteConfig.linkedinUrl
+    ? [{ label: "LinkedIn", href: siteConfig.linkedinUrl, external: true }]
+    : []),
+  ...(siteConfig.email
+    ? [{ label: "Email", href: `mailto:${siteConfig.email}` }]
+    : []),
+];
+
 export const homepageData = {
   availability: "Available for new graduate roles",
   name: siteConfig.name,
@@ -45,21 +55,7 @@ export const homepageData = {
     "I build thoughtful software across full-stack systems, data and applied AI.",
     "First-Class Computer Science graduate creating products that are technically strong, visually considered and genuinely useful.",
   ],
-  socialLinks: [
-    {
-      label: "GitHub",
-      href: siteConfig.githubUrl,
-      external: true,
-      placeholder: true,
-    },
-    {
-      label: "LinkedIn",
-      href: siteConfig.linkedinUrl,
-      external: true,
-      placeholder: true,
-    },
-    { label: "Email", href: `mailto:${siteConfig.email}`, placeholder: true },
-  ],
+  socialLinks,
   projects: [
     {
       index: "01",
@@ -79,22 +75,12 @@ export const homepageData = {
       year: "2026",
       href: "/projects",
     },
-    {
-      index: "03",
-      title: "Project Placeholder",
-      description:
-        "Placeholder project entry ready to replace when the next case study is selected.",
-      technologies: ["Technology TBD"],
-      year: "TBD",
-      href: "/projects",
-      placeholder: true,
-    },
   ],
   profile:
     "I am a First-Class Computer Science graduate and software engineer based in London. I enjoy building complete products, from architecture and APIs to interaction design, performance and deployment.",
   highlights: [
     { value: "01", label: "First-Class degree" },
-    { value: "03", label: "Selected projects" },
+    { value: "02", label: "Selected projects" },
     { value: "01", label: "London base" },
   ],
   currently: [

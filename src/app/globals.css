@@ -271,7 +271,6 @@ summary {
 .availability,
 .location-block,
 .project-row__summary ul,
-.project-placeholder,
 .profile-highlights dd,
 .contact-footer__location {
   font-family: var(--font-geist-mono), monospace;
@@ -418,11 +417,6 @@ summary {
   line-height: 1.1;
   letter-spacing: -0.025em;
   text-transform: uppercase;
-}
-
-.project-placeholder {
-  color: var(--color-muted);
-  font-size: 0.62rem;
 }
 
 .project-row__summary {
@@ -896,6 +890,13 @@ summary {
   }
 }
 
+@media (scripting: none) {
+  .motion-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @keyframes route-content-in {
   from {
     opacity: 0.96;
@@ -1037,13 +1038,6 @@ summary {
   letter-spacing: -0.035em;
   text-transform: uppercase;
   transition: font-weight var(--transition-fast);
-}
-
-.projects-index-row__placeholder {
-  color: var(--color-muted);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.62rem;
-  text-transform: uppercase;
 }
 
 .projects-index-row__description {

@@ -47,7 +47,7 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
       <div className="projects-index-list">
         {filteredProjects.map((project, index) => (
           <MotionLink
-            className="projects-index-row"
+            className="projects-index-row motion-reveal"
             href={project.href}
             id={project.id}
             key={project.id}
@@ -77,9 +77,6 @@ export function ProjectsFilter({ projects }: { projects: readonly Project[] }) {
             <span className="projects-index-row__content">
               <span className="projects-index-row__title-line">
                 <h2 className="projects-index-row__title">{project.title}</h2>
-                {project.placeholder ? (
-                  <span className="projects-index-row__placeholder">Placeholder</span>
-                ) : null}
               </span>
               <span className="projects-index-row__description">{project.description}</span>
               <span className="projects-index-row__technologies">

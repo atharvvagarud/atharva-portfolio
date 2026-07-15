@@ -76,6 +76,10 @@ export const metadata: Metadata = {
   },
 };
 
+const personSameAs = [siteConfig.githubUrl, siteConfig.linkedinUrl].filter(
+  (url): url is string => Boolean(url),
+);
+
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -84,7 +88,8 @@ const structuredData = {
       "@id": `${siteConfig.siteUrl}/#person`,
       name: siteConfig.name,
       url: siteConfig.siteUrl,
-      email: `mailto:${siteConfig.email}`,
+      ...(siteConfig.email ? { email: `mailto:${siteConfig.email}` } : {}),
+      ...(personSameAs.length > 0 ? { sameAs: personSameAs } : {}),
       homeLocation: {
         "@type": "Place",
         name: siteConfig.location,

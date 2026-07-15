@@ -1,5 +1,6 @@
 "use client";
 
+import { clsx } from "clsx";
 import {
   motion,
   useReducedMotion,
@@ -9,11 +10,12 @@ import {
 const easeOut = [0.16, 1, 0.3, 1] as const;
 const viewport = { once: true, amount: 0.16 } as const;
 
-export function HeroReveal({ children, ...props }: HTMLMotionProps<"section">) {
+export function HeroReveal({ children, className, ...props }: HTMLMotionProps<"section">) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.section
+      className={clsx("motion-reveal", className)}
       initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.55, ease: easeOut }}
@@ -26,12 +28,14 @@ export function HeroReveal({ children, ...props }: HTMLMotionProps<"section">) {
 
 export function InitialRevealHeader({
   children,
+  className,
   ...props
 }: HTMLMotionProps<"header">) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.header
+      className={clsx("motion-reveal", className)}
       initial={reduceMotion ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.5, ease: easeOut }}
@@ -42,11 +46,12 @@ export function InitialRevealHeader({
   );
 }
 
-export function SectionReveal({ children, ...props }: HTMLMotionProps<"section">) {
+export function SectionReveal({ children, className, ...props }: HTMLMotionProps<"section">) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.section
+      className={clsx("motion-reveal", className)}
       initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewport}
@@ -60,6 +65,7 @@ export function SectionReveal({ children, ...props }: HTMLMotionProps<"section">
 
 export function RevealArticle({
   children,
+  className,
   delay = 0,
   ...props
 }: HTMLMotionProps<"article"> & { delay?: number }) {
@@ -67,6 +73,7 @@ export function RevealArticle({
 
   return (
     <motion.article
+      className={clsx("motion-reveal", className)}
       initial={reduceMotion ? false : { opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewport}

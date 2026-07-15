@@ -25,13 +25,11 @@ export type Project = {
   year: string;
   href: string;
   preview: ProjectPreview;
-  placeholder?: boolean;
 };
 
 export const projectPreviewPaths = {
   pulse: "/images/projects/pulse-preview.png",
   f1Prediction: "/images/projects/f1-prediction-preview.png",
-  placeholder: "/images/projects/project-placeholder-preview.png",
 } as const;
 
 export const projects = [
@@ -47,7 +45,7 @@ export const projects = [
     href: "/projects#pulse",
     preview: {
       src: projectPreviewPaths.pulse,
-      alt: "Placeholder preview of the Pulse health analytics interface",
+      alt: "Pulse health analytics interface showing personal health data",
       width: 1200,
       height: 675,
     },
@@ -64,27 +62,9 @@ export const projects = [
     href: "/projects#f1-in-race-winner-prediction",
     preview: {
       src: projectPreviewPaths.f1Prediction,
-      alt: "Placeholder preview of the F1 in-race prediction interface",
+      alt: "F1 in-race winner prediction interface with race data and probabilities",
       width: 1200,
       height: 675,
     },
-  },
-  {
-    id: "project-placeholder",
-    index: "03",
-    title: "Project Placeholder",
-    description:
-      "Reserved project entry ready to replace when the next case study is selected.",
-    technologies: ["Technology TBD"],
-    categories: ["Tools"],
-    year: "TBD",
-    href: "/projects#project-placeholder",
-    preview: {
-      src: projectPreviewPaths.placeholder,
-      alt: "Clearly marked placeholder preview for a future software project",
-      width: 1200,
-      height: 675,
-    },
-    placeholder: true,
   },
 ] as const satisfies readonly Project[];

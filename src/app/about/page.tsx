@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
-import { pageSeo } from "@/config/site";
+import { pageSeo, siteConfig } from "@/config/site";
 import { aboutData, type AboutLink } from "@/data/about";
 import { createPageMetadata } from "@/lib/seo";
 
@@ -26,7 +26,7 @@ function AboutLinkItem({ link }: { link: AboutLink }) {
       className="about-link"
       href={link.href}
       target={link.external ? "_blank" : undefined}
-      rel={link.external ? "noreferrer" : undefined}
+      rel={link.external ? "noopener noreferrer" : undefined}
       aria-label={link.external ? `${link.label}, opens in a new tab` : link.label}
     >
       {link.label}
@@ -141,20 +141,24 @@ export default function AboutPage() {
             </p>
             <p className="about-availability__location">{aboutData.location}</p>
 
-            <nav className="about-availability__links" aria-label="Contact and profile links">
-              {aboutData.links.map((link) => (
-                <AboutLinkItem key={link.label} link={link} />
-              ))}
-            </nav>
+            {aboutData.links.length > 0 ? (
+              <nav className="about-availability__links" aria-label="Contact and profile links">
+                {aboutData.links.map((link) => (
+                  <AboutLinkItem key={link.label} link={link} />
+                ))}
+              </nav>
+            ) : null}
 
-            <a
-              className="button-primary about-cv-button"
-              href={aboutData.cv.href}
-              download
-            >
-              {aboutData.cv.label}
-              <Download aria-hidden="true" size={17} strokeWidth={1.5} />
-            </a>
+            {aboutData.cv.available ? (
+              <a
+                className="button-primary about-cv-button"
+                href={aboutData.cv.href}
+                download
+              >
+                {aboutData.cv.label}
+                <Download aria-hidden="true" size={17} strokeWidth={1.5} />
+              </a>
+            ) : null}
           </aside>
         </SectionReveal>
       </article>
@@ -162,10 +166,12 @@ export default function AboutPage() {
       <footer className="about-contact" id="contact">
         <div>
           <p>Interested in working together?</p>
-          <a href={aboutData.links[0].href}>
-            Get in touch
-            <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
-          </a>
+          {siteConfig.email ? (
+            <a href={`mailto:${siteConfig.email}`}>
+              Get in touch
+              <ArrowRight aria-hidden="true" size={28} strokeWidth={1.4} />
+            </a>
+          ) : null}
         </div>
         <p>{aboutData.location}</p>
       </footer>

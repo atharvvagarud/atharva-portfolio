@@ -106,7 +106,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
 
     return (
       <motion.section
-        className="photo-viewer"
+        className="photo-viewer motion-reveal"
         aria-labelledby="photo-viewer-title"
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -183,7 +183,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
     <>
       <div className="photography-page">
         <motion.header
-          className="photography-header"
+          className="photography-header motion-reveal"
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -240,7 +240,7 @@ export function PhotographyExperience({ photos }: PhotographyExperienceProps) {
           <div className="photo-grid" id="photography-grid">
             {visiblePhotos.map((photo, index) => (
               <motion.button
-                className="photo-tile"
+                className="photo-tile motion-reveal"
                 type="button"
                 key={photo.id}
                 ref={(element) => {
