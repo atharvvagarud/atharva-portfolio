@@ -4,8 +4,8 @@ import Link from "next/link";
 import { InitialRevealHeader } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
-import { projects } from "@/data/projects";
 import { createPageMetadata } from "@/lib/seo";
+import { getProjects } from "@/sanity/lib/get-projects";
 import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 import { ProjectsFilter } from "./projects-filter";
 
@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ProjectsPage() {
   const settings = await getSiteSettings();
+  const projects = await getProjects();
 
   return (
     <SiteContainer>

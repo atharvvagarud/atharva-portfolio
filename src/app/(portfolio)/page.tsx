@@ -8,8 +8,11 @@ import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
 import { homepageData } from "@/data/homepage";
 import { createPageMetadata } from "@/lib/seo";
+import { getProjectDestination } from "@/lib/project-links";
 import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
+import { getHomepageProjects } from "@/sanity/lib/get-projects";
 import { getSiteSettings } from "@/sanity/lib/get-site-settings";
+import type { Project } from "@/types/project";
 import type { SiteSettings } from "@/types/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -118,32 +121,53 @@ function Hero({
   );
 }
 
-function SelectedWork() {
+function SelectedWork({ projects }: { projects: readonly Project[] }) {
   return (
     <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
       <SectionLabel id="selected-work-title" number="01">Selected work</SectionLabel>
 
       <div className="project-list">
-        {homepageData.projects.map((project, index) => (
-          <RevealArticle className="project-row" delay={index * 0.05} key={project.index}>
-            <p className="project-row__index">{project.index}</p>
-            <div className="project-row__title-wrap">
-              <h3 className="project-row__title">{project.title}</h3>
-            </div>
-            <div className="project-row__summary">
-              <p>{project.description}</p>
-              <ul aria-label={`${project.title} technologies`}>
-                {project.technologies.map((technology) => (
-                  <li key={technology}>{technology}</li>
-                ))}
-              </ul>
-            </div>
-            <p className="project-row__year">{project.year}</p>
-            <Link className="project-row__link" href={project.href} aria-label={`View ${project.title}`}>
-              <ArrowRight aria-hidden="true" size={22} strokeWidth={1.4} />
-            </Link>
-          </RevealArticle>
-        ))}
+        {projects.map((project, index) => {
+          const destination = getProjectDestination(project);
+          const indexLabel = String(index + 1).padStart(2, "0");
+
+          return (
+            <RevealArticle
+              className="project-row"
+              delay={index * 0.05}
+              key={project.id}
+            >
+              <p className="project-row__index">{indexLabel}</p>
+              <div className="project-row__title-wrap">
+                <h3 className="project-row__title">{project.title}</h3>
+              </div>
+              <div className="project-row__summary">
+                <p>{project.shortDescription}</p>
+                <ul aria-label={`${project.title} technologies`}>
+                  {project.technologies.map((technology) => (
+                    <li key={technology}>{technology}</li>
+                  ))}
+                </ul>
+              </div>
+              <p className="project-row__year">{project.year}</p>
+              {destination ? (
+                <Link
+                  className="project-row__link"
+                  href={destination}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`View ${project.title}, opens in a new tab`}
+                >
+                  <ArrowRight
+                    aria-hidden="true"
+                    size={22}
+                    strokeWidth={1.4}
+                  />
+                </Link>
+              ) : null}
+            </RevealArticle>
+          );
+        })}
       </div>
     </section>
   );
@@ -235,13 +259,14 @@ function ContactFooter({
 
 export default async function Home() {
   const settings = await getSiteSettings();
+  const projects = await getHomepageProjects();
   const socialLinks = getSiteContactLinks(settings);
 
   return (
     <SiteContainer>
       <Hero settings={settings} socialLinks={socialLinks} />
       <hr className="divider" />
-      <SelectedWork />
+      <SelectedWork projects={projects} />
       <ProfileAndCurrently />
       <OffScreen />
       <ContactFooter settings={settings} socialLinks={socialLinks} />
