@@ -9,7 +9,7 @@ import {
   photoFilters,
   type Photo,
   type PhotoFilter,
-} from "@/data/photography";
+} from "@/types/photo";
 
 type PhotographyExperienceProps = {
   photos: readonly Photo[];
@@ -127,10 +127,10 @@ export function PhotographyExperience({
           <figure className="photo-viewer__figure">
             <Image
               className="photo-viewer__image"
-              src={activePhoto.src}
+              src={activePhoto.imageUrl}
               alt={activePhoto.alt}
-              width={activePhoto.width}
-              height={activePhoto.height}
+              width={activePhoto.imageWidth}
+              height={activePhoto.imageHeight}
               sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1599px) 74vw, 1184px"
             />
           </figure>
@@ -142,25 +142,33 @@ export function PhotographyExperience({
               <h1 ref={viewerHeading} id="photo-viewer-title" tabIndex={-1}>
                 {activePhoto.title}
               </h1>
-              <p>{activePhoto.summary}</p>
+              {activePhoto.summary ? <p>{activePhoto.summary}</p> : null}
             </div>
 
             <dl className="photo-viewer__metadata">
-              <div>
-                <dt>Location</dt>
-                <dd>{activePhoto.location}</dd>
-              </div>
+              {activePhoto.location ? (
+                <div>
+                  <dt>Location</dt>
+                  <dd>{activePhoto.location}</dd>
+                </div>
+              ) : null}
               <div>
                 <dt>Year</dt>
                 <dd>{activePhoto.year}</dd>
               </div>
-              <div>
-                <dt>Category</dt>
-                <dd>{activePhoto.category}</dd>
-              </div>
+              {activePhoto.category ? (
+                <div>
+                  <dt>Category</dt>
+                  <dd>{activePhoto.category}</dd>
+                </div>
+              ) : null}
             </dl>
 
-            <p className="photo-viewer__description">{activePhoto.description}</p>
+            {activePhoto.description ? (
+              <p className="photo-viewer__description">
+                {activePhoto.description}
+              </p>
+            ) : null}
 
             <div className="photo-viewer__navigation" aria-label="Photo navigation">
               <button type="button" onClick={() => navigate(-1)}>
@@ -257,7 +265,11 @@ export function PhotographyExperience({
                 ref={(element) => {
                   photoButtons.current[photo.id] = element;
                 }}
-                aria-label={`View ${photo.title}, ${photo.location}`}
+                aria-label={
+                  photo.location
+                    ? `View ${photo.title}, ${photo.location}`
+                    : `View ${photo.title}`
+                }
                 onClick={() => openPhoto(photo.id)}
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -271,16 +283,16 @@ export function PhotographyExperience({
                 <span className="photo-tile__image-wrap">
                   <Image
                     className="photo-tile__image"
-                    src={photo.src}
-                    alt=""
-                    width={photo.width}
-                    height={photo.height}
+                    src={photo.imageUrl}
+                    alt={photo.alt}
+                    width={photo.imageWidth}
+                    height={photo.imageHeight}
                     sizes="(max-width: 767px) calc((100vw - 3.5rem) / 2), (max-width: 1199px) calc((100vw - 6.5rem) / 3), (max-width: 1599px) 20vw, 320px"
                   />
                 </span>
                 <span className="photo-tile__caption">
                   <span>{photo.title}</span>
-                  <span>{photo.location}</span>
+                  {photo.location ? <span>{photo.location}</span> : null}
                 </span>
               </motion.button>
             ))}
