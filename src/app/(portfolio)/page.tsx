@@ -6,12 +6,15 @@ import { LondonTime } from "@/components/london-time";
 import { HeroReveal, RevealArticle, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
-import { homepageData } from "@/data/homepage";
 import { createPageMetadata } from "@/lib/seo";
 import { getProjectDestination } from "@/lib/project-links";
 import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
-import { getHomepageProjects } from "@/sanity/lib/get-projects";
+import { getHomepageContent } from "@/sanity/lib/get-homepage";
 import { getSiteSettings } from "@/sanity/lib/get-site-settings";
+import type {
+  HomepageContent,
+  HomepageOffScreenItem,
+} from "@/types/homepage";
 import type { Project } from "@/types/project";
 import type { SiteSettings } from "@/types/site-settings";
 
@@ -67,29 +70,27 @@ function SocialLink({
 }
 
 function Hero({
-  settings,
+  content,
   socialLinks,
 }: {
-  settings: SiteSettings;
+  content: HomepageContent;
   socialLinks: readonly SiteLink[];
 }) {
-  const [firstName, ...remainingName] = homepageData.name.split(" ");
-
   return (
     <HeroReveal className="home-hero" aria-labelledby="home-title">
       <p className="availability">
         <span className="status-dot" aria-hidden="true" />
-        {settings.availabilityLabel}
+        {content.availabilityText}
       </p>
 
       <div className="home-hero__title-row">
         <h1 id="home-title" className="home-title">
-          <span>{firstName}</span>
-          <span>{remainingName.join(" ")}</span>
+          <span>{content.heroFirstName}</span>
+          <span>{content.heroLastName}</span>
         </h1>
 
         <aside className="location-block" aria-label="Location and local time">
-          <p>{settings.location}</p>
+          <p>{content.locationLabel}</p>
           <p>
             <span>Local time</span>
             <LondonTime />
@@ -98,9 +99,8 @@ function Hero({
       </div>
 
       <div className="home-introduction">
-        {homepageData.introduction.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+        <p>{content.primaryIntroduction}</p>
+        <p>{content.secondaryIntroduction}</p>
       </div>
 
       <div className="home-actions">
@@ -173,14 +173,20 @@ function SelectedWork({ projects }: { projects: readonly Project[] }) {
   );
 }
 
-function ProfileAndCurrently() {
+function ProfileAndCurrently({ content }: { content: HomepageContent }) {
+  const currently = [
+    { label: "Building", value: content.currently.building },
+    { label: "Learning", value: content.currently.learning },
+    { label: "Exploring", value: content.currently.exploring },
+  ] as const;
+
   return (
     <SectionReveal className="profile-currently" aria-label="Profile and current interests">
       <div className="profile-block">
         <SectionLabel number="02">Profile</SectionLabel>
-        <p className="profile-copy">{homepageData.profile}</p>
+        <p className="profile-copy">{content.profileSummary}</p>
         <dl className="profile-highlights">
-          {homepageData.highlights.map((highlight) => (
+          {content.profileStatistics.map((highlight) => (
             <div key={highlight.label}>
               <dt>{highlight.value}</dt>
               <dd>{highlight.label}</dd>
@@ -192,7 +198,7 @@ function ProfileAndCurrently() {
       <div className="currently-block">
         <SectionLabel number="03">Currently</SectionLabel>
         <dl className="currently-list">
-          {homepageData.currently.map((item) => (
+          {currently.map((item) => (
             <div key={item.label}>
               <dt>{item.label}</dt>
               <dd>{item.value}</dd>
@@ -204,22 +210,77 @@ function ProfileAndCurrently() {
   );
 }
 
-function OffScreen() {
+function OffScreenPanel({ item }: { item: HomepageOffScreenItem }) {
+  const isText = item.type === "text";
+  const panel = (
+    <article className={`off-screen-panel off-screen-panel--${item.type}`}>
+      {item.smallLabel ? (
+        <p className="off-screen-panel__label">{item.smallLabel}</p>
+      ) : null}
+      <h3>{isText ? item.title : item.primaryText}</h3>
+      {isText ? (
+        <p className="off-screen-panel__text">{item.primaryText}</p>
+      ) : null}
+      {item.secondaryText ? (
+        <p className="off-screen-panel__text">{item.secondaryText}</p>
+      ) : null}
+    </article>
+  );
+
+  return item.externalUrl ? (
+    <Link
+      className="off-screen-item"
+      href={item.externalUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${item.externalLabel || item.title}, opens in a new tab`}
+    >
+      {panel}
+    </Link>
+  ) : (
+    panel
+  );
+}
+
+function OffScreen({ items }: { items: readonly HomepageOffScreenItem[] }) {
   return (
     <SectionReveal className="home-section off-screen" aria-labelledby="off-screen-title">
       <SectionLabel id="off-screen-title" number="04">Off screen</SectionLabel>
       <div className="off-screen-grid">
-        {homepageData.offScreenImages.map((image) => (
-          <figure key={image.src}>
-            <Image
-              src={image.src}
-              alt={image.alt}
-              width={image.width}
-              height={image.height}
-              sizes="(max-width: 639px) calc((100vw - 3.75rem) / 2), (max-width: 1023px) calc((100vw - 7.5rem) / 4), 23vw"
-            />
-          </figure>
-        ))}
+        {items.map((item) => {
+          if (item.type !== "image") {
+            return <OffScreenPanel item={item} key={item.id} />;
+          }
+
+          const image = (
+            <figure>
+              <Image
+                src={item.imageUrl}
+                alt={item.imageAlt}
+                width={item.imageWidth}
+                height={item.imageHeight}
+                sizes="(max-width: 639px) calc((100vw - 3.75rem) / 2), (max-width: 1023px) calc((100vw - 7.5rem) / 4), 23vw"
+              />
+            </figure>
+          );
+
+          return item.externalUrl ? (
+            <Link
+              className="off-screen-item"
+              href={item.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${item.externalLabel || item.title}, opens in a new tab`}
+              key={item.id}
+            >
+              {image}
+            </Link>
+          ) : (
+            <div className="off-screen-item" key={item.id}>
+              {image}
+            </div>
+          );
+        })}
       </div>
     </SectionReveal>
   );
@@ -259,16 +320,16 @@ function ContactFooter({
 
 export default async function Home() {
   const settings = await getSiteSettings();
-  const projects = await getHomepageProjects();
+  const content = await getHomepageContent(settings.location);
   const socialLinks = getSiteContactLinks(settings);
 
   return (
     <SiteContainer>
-      <Hero settings={settings} socialLinks={socialLinks} />
+      <Hero content={content} socialLinks={socialLinks} />
       <hr className="divider" />
-      <SelectedWork projects={projects} />
-      <ProfileAndCurrently />
-      <OffScreen />
+      <SelectedWork projects={content.selectedProjects} />
+      <ProfileAndCurrently content={content} />
+      <OffScreen items={content.offScreenItems} />
       <ContactFooter settings={settings} socialLinks={socialLinks} />
     </SiteContainer>
   );

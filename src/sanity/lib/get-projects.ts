@@ -100,7 +100,7 @@ function fallbackPreview(slug: string) {
       };
 }
 
-function normalizeProject(value: ProjectsQueryResult): Project | null {
+export function normalizeProject(value: ProjectsQueryResult): Project | null {
   const id = value._id?.trim();
   const slug = value.slug?.trim();
   const title = value.title?.trim();

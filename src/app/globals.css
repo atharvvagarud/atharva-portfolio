@@ -565,10 +565,63 @@ summary {
   border-radius: var(--radius-small);
 }
 
+.off-screen-item {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
 .off-screen-grid img {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.off-screen-panel {
+  display: flex;
+  min-height: 100%;
+  aspect-ratio: 4 / 3;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+}
+
+.off-screen-panel p,
+.off-screen-panel h3 {
+  margin: 0;
+}
+
+.off-screen-panel__label {
+  margin-bottom: auto;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.off-screen-panel h3 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 520;
+  line-height: 1.15;
+}
+
+.off-screen-panel__text {
+  margin-top: 0.35rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.off-screen-panel--music {
+  color: var(--color-background);
+  background: var(--color-foreground);
+  border-color: var(--color-foreground);
+}
+
+.off-screen-panel--music .off-screen-panel__text {
+  color: color-mix(in srgb, var(--color-background) 68%, transparent);
 }
 
 .contact-footer {

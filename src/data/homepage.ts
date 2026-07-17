@@ -1,63 +1,85 @@
-import { siteOwnerName } from "@/config/site";
+import { siteSettingsFallback } from "@/config/site-fallback";
+import { homepageProjectFallback } from "@/data/projects";
+import type { HomepageContent } from "@/types/homepage";
 
-export type OffScreenImage = {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-};
-
-export type HomepageData = {
-  name: string;
-  introduction: readonly [string, string];
-  profile: string;
-  highlights: readonly { value: string; label: string }[];
-  currently: readonly { label: string; value: string }[];
-  offScreenImages: readonly OffScreenImage[];
-};
-
-export const homepageData = {
-  name: siteOwnerName,
-  introduction: [
+export const homepageFallback = {
+  availabilityText: siteSettingsFallback.availabilityLabel,
+  heroFirstName: "Atharva",
+  heroLastName: "Garud",
+  primaryIntroduction:
     "I build thoughtful software across full-stack systems, data and applied AI.",
+  secondaryIntroduction:
     "First-Class Computer Science graduate creating products that are technically strong, visually considered and genuinely useful.",
-  ],
-  profile:
+  locationLabel: siteSettingsFallback.location,
+  selectedProjects: homepageProjectFallback,
+  profileSummary:
     "I am a First-Class Computer Science graduate and software engineer based in London. I enjoy building complete products, from architecture and APIs to interaction design, performance and deployment.",
-  highlights: [
+  profileStatistics: [
     { value: "01", label: "First-Class degree" },
     { value: "02", label: "Selected projects" },
     { value: "01", label: "London base" },
   ],
-  currently: [
-    { label: "Building", value: "Pulse health analytics" },
-    { label: "Learning", value: "Swift and native iOS development" },
-    { label: "Exploring", value: "AI agents, local models and developer tooling" },
+  currently: {
+    building: "Pulse health analytics",
+    learning: "Swift and native iOS development",
+    exploring: "AI agents, local models and developer tooling",
+  },
+  offScreenItems: [
+    {
+      id: "off-screen-highlands",
+      type: "image",
+      title: "Highlands",
+      smallLabel: null,
+      primaryText: "Highland road",
+      secondaryText: null,
+      externalUrl: null,
+      externalLabel: null,
+      imageUrl: "/images/off-screen-highlands.png",
+      imageAlt: "A quiet mountain road winding through a cloudy Highland valley",
+      imageWidth: 1000,
+      imageHeight: 750,
+    },
+    {
+      id: "off-screen-training",
+      type: "image",
+      title: "Training",
+      smallLabel: null,
+      primaryText: "Training",
+      secondaryText: null,
+      externalUrl: null,
+      externalLabel: null,
+      imageUrl: "/images/off-screen-training.png",
+      imageAlt: "Black and white photograph of a person training in a quiet gym",
+      imageWidth: 1000,
+      imageHeight: 750,
+    },
+    {
+      id: "off-screen-sketchbook",
+      type: "image",
+      title: "Sketchbook",
+      smallLabel: null,
+      primaryText: "Product sketches",
+      secondaryText: null,
+      externalUrl: null,
+      externalLabel: null,
+      imageUrl: "/images/off-screen-sketchbook.png",
+      imageAlt: "An open sketchbook containing interface and product diagrams",
+      imageWidth: 1000,
+      imageHeight: 750,
+    },
+    {
+      id: "off-screen-london",
+      type: "image",
+      title: "London",
+      smallLabel: null,
+      primaryText: "London after dark",
+      secondaryText: null,
+      externalUrl: null,
+      externalLabel: null,
+      imageUrl: "/images/off-screen-london.png",
+      imageAlt: "A subdued London skyline beneath a deep blue evening sky",
+      imageWidth: 1000,
+      imageHeight: 750,
+    },
   ],
-  offScreenImages: [
-    {
-      src: "/images/off-screen-highlands.png",
-      alt: "A quiet mountain road winding through a cloudy Highland valley",
-      width: 1000,
-      height: 750,
-    },
-    {
-      src: "/images/off-screen-training.png",
-      alt: "Black and white photograph of a person training in a quiet gym",
-      width: 1000,
-      height: 750,
-    },
-    {
-      src: "/images/off-screen-sketchbook.png",
-      alt: "An open sketchbook containing interface and product diagrams",
-      width: 1000,
-      height: 750,
-    },
-    {
-      src: "/images/off-screen-london.png",
-      alt: "A subdued London skyline beneath a deep blue evening sky",
-      width: 1000,
-      height: 750,
-    },
-  ],
-} as const satisfies HomepageData;
+} as const satisfies HomepageContent;
