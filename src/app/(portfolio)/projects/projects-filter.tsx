@@ -38,6 +38,7 @@ function ProjectRowContent({
           width={project.previewImageWidth}
           height={project.previewImageHeight}
           sizes="(max-width: 767px) calc(100vw - 5.75rem), (max-width: 1023px) 40vw, (max-width: 1599px) 28vw, 448px"
+          loading={index === 0 ? "eager" : "lazy"}
         />
       </span>
 

@@ -7,6 +7,7 @@ import { aboutFallback } from "@/data/about";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import { normalizePageSeo } from "@/sanity/lib/normalize-page-seo";
 import {
   aboutQuery,
   type AboutQueryResult,
@@ -241,6 +242,7 @@ function normalizeAbout(value: AboutQueryResult): NormalizedAbout {
         valueOrNull(value.availabilityText) || aboutFallback.availabilityText,
       cvCtaLabel:
         valueOrNull(value.cvCallToActionLabel) || aboutFallback.cvCtaLabel,
+      seo: normalizePageSeo(value.seo),
     },
     fallbackReasons,
   };

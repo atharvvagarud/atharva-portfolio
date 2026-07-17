@@ -1,6 +1,7 @@
 import { siteSettingsFallback } from "@/config/site-fallback";
 import { homepageProjectFallback } from "@/data/projects";
 import type { HomepageContent } from "@/types/homepage";
+import { emptyPageSeo } from "@/types/page-seo";
 
 export const homepageFallback = {
   availabilityText: siteSettingsFallback.availabilityLabel,
@@ -82,4 +83,5 @@ export const homepageFallback = {
       imageHeight: 750,
     },
   ],
+  seo: emptyPageSeo,
 } as const satisfies HomepageContent;

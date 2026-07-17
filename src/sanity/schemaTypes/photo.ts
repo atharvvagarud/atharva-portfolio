@@ -121,7 +121,7 @@ export const photo = defineType({
       title: "Published",
       type: "boolean",
       group: "publishing",
-      description: "Controls whether the public site may include this photo after migration.",
+      description: "Controls whether the public site includes this photo.",
       initialValue: false,
     }),
     defineField({

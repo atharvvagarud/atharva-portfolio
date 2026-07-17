@@ -20,13 +20,17 @@ import type { SiteSettings } from "@/types/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
+  const content = await getHomepageContent(settings.location);
 
   return createPageMetadata(
     {
       ...pageSeo.home,
-      title: settings.defaultSeoTitle,
-      description: settings.defaultSeoDescription,
-      image: settings.defaultOpenGraphImage.url,
+      title: content.seo.title || settings.defaultSeoTitle,
+      description:
+        content.seo.description || settings.defaultSeoDescription,
+      image:
+        content.seo.openGraphImage?.url ||
+        settings.defaultOpenGraphImage.url,
     },
     settings,
   );

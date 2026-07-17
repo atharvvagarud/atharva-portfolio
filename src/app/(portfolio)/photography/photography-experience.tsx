@@ -288,6 +288,7 @@ export function PhotographyExperience({
                     width={photo.imageWidth}
                     height={photo.imageHeight}
                     sizes="(max-width: 767px) calc((100vw - 3.5rem) / 2), (max-width: 1199px) calc((100vw - 6.5rem) / 3), (max-width: 1599px) 20vw, 320px"
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
                 </span>
                 <span className="photo-tile__caption">

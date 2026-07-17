@@ -1,4 +1,5 @@
 import type { Project } from "@/types/project";
+import type { PageSeoContent } from "@/types/page-seo";
 
 export type HomepageStatistic = {
   readonly value: string;
@@ -54,4 +55,5 @@ export type HomepageContent = {
   readonly profileStatistics: readonly HomepageStatistic[];
   readonly currently: HomepageCurrently;
   readonly offScreenItems: readonly HomepageOffScreenItem[];
+  readonly seo: PageSeoContent;
 };

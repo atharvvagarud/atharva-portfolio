@@ -1,10 +1,12 @@
 import type { PortableTextBlock } from "@portabletext/react";
 import { siteSettingsFallback } from "@/config/site-fallback";
 import type { AboutContent } from "@/types/about";
+import { emptyPageSeo } from "@/types/page-seo";
 
 export const ABOUT_CV_FALLBACK = {
   url: "/resume/atharva-garud-cv.pdf",
   filename: "atharva-garud-cv.pdf",
+  available: false,
 } as const;
 
 function paragraph(key: string, text: string): PortableTextBlock {
@@ -92,4 +94,5 @@ export const aboutFallback = {
   ],
   availabilityText: siteSettingsFallback.availabilityLabel,
   cvCtaLabel: "Download CV",
+  seo: emptyPageSeo,
 } as const satisfies AboutContent;

@@ -11,6 +11,7 @@ import {
   HOMEPAGE_PROJECT_LIMIT,
   normalizeProject,
 } from "@/sanity/lib/get-projects";
+import { normalizePageSeo } from "@/sanity/lib/normalize-page-seo";
 import {
   homepageQuery,
   type HomepageQueryOffScreenItem,
@@ -235,6 +236,7 @@ async function normalizeHomepage(
       },
       offScreenItems:
         offScreenItems.length > 0 ? offScreenItems : fallback.offScreenItems,
+      seo: normalizePageSeo(value.seo),
     },
     fallbackReasons,
   };

@@ -3,6 +3,7 @@ import type {
   ProjectsQueryImage,
   ProjectsQueryResult,
 } from "@/sanity/queries/projects";
+import type { SanitySeoQueryResult } from "@/sanity/queries/seo";
 
 export type HomepageQueryStatistic = {
   value?: string | null;
@@ -39,6 +40,7 @@ export type HomepageQueryResult = {
   currentlyLearning?: string | null;
   currentlyExploring?: string | null;
   offScreenItems?: Array<HomepageQueryOffScreenItem | null> | null;
+  seo?: SanitySeoQueryResult | null;
 };
 
 export const homepageQuery = defineQuery(`
@@ -115,6 +117,18 @@ export const homepageQuery = defineQuery(`
         url
       },
       altText
+    },
+    seo {
+      title,
+      description,
+      openGraphImage {
+        asset-> {
+          _id,
+          url
+        },
+        crop,
+        hotspot
+      }
     }
   }
 `);

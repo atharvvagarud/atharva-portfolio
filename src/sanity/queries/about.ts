@@ -1,5 +1,6 @@
 import { defineQuery } from "next-sanity";
 import type { ProjectsQueryImage } from "@/sanity/queries/projects";
+import type { SanitySeoQueryResult } from "@/sanity/queries/seo";
 
 export type AboutQuerySpan = {
   _key?: string | null;
@@ -41,6 +42,7 @@ export type AboutQueryResult = {
   currentFocusEntries?: Array<AboutQueryCurrentFocusEntry | null> | null;
   availabilityText?: string | null;
   cvCallToActionLabel?: string | null;
+  seo?: SanitySeoQueryResult | null;
 };
 
 export const aboutQuery = defineQuery(`
@@ -78,6 +80,18 @@ export const aboutQuery = defineQuery(`
       description
     },
     availabilityText,
-    cvCallToActionLabel
+    cvCallToActionLabel,
+    seo {
+      title,
+      description,
+      openGraphImage {
+        asset-> {
+          _id,
+          url
+        },
+        crop,
+        hotspot
+      }
+    }
   }
 `);

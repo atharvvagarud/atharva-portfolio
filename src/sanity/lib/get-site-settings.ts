@@ -20,6 +20,11 @@ import type {
 export const SITE_SETTINGS_REVALIDATE_SECONDS = 3600;
 export const SITE_SETTINGS_CACHE_TAG = "sanity:siteSettings";
 
+function logSiteSettingsFallback(reason: string): void {
+  if (process.env.NODE_ENV !== "development") return;
+  console.warn(`[site-settings] fallback=true reason=${reason}`);
+}
+
 function nonEmptyString(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback;
 }
@@ -158,9 +163,7 @@ function normalizeSiteSettings(value: SiteSettingsQueryResult): SiteSettings {
 
 async function fetchSiteSettings(): Promise<SiteSettings> {
   if (!isSanityConfigured || !sanityClient) {
-    console.warn(
-      "[site-settings] Sanity is not configured; using static fallbacks.",
-    );
+    logSiteSettingsFallback("sanity-not-configured");
     return siteSettingsFallback;
   }
 
@@ -178,18 +181,14 @@ async function fetchSiteSettings(): Promise<SiteSettings> {
     );
 
     if (!result) {
-      console.warn(
-        "[site-settings] Published singleton not found; using static fallbacks.",
-      );
+      logSiteSettingsFallback("published-singleton-not-found");
       return siteSettingsFallback;
     }
 
     return normalizeSiteSettings(result);
   } catch (error) {
     const reason = error instanceof Error ? error.name : "UnknownError";
-    console.warn(
-      `[site-settings] Published content could not be loaded (${reason}); using static fallbacks.`,
-    );
+    logSiteSettingsFallback(`query-error:${reason}`);
     return siteSettingsFallback;
   }
 }

@@ -13,8 +13,20 @@ import { getAboutContent } from "@/sanity/lib/get-about";
 import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
-  return createPageMetadata(pageSeo.about, settings);
+  const [settings, content] = await Promise.all([
+    getSiteSettings(),
+    getAboutContent(),
+  ]);
+
+  return createPageMetadata(
+    {
+      ...pageSeo.about,
+      title: content.seo.title || pageSeo.about.title,
+      description: content.seo.description || pageSeo.about.description,
+      image: content.seo.openGraphImage?.url || pageSeo.about.image,
+    },
+    settings,
+  );
 }
 
 function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
@@ -61,8 +73,17 @@ export default async function AboutPage() {
     getAboutContent(),
   ]);
   const contactLinks = getSiteContactLinks(settings);
-  const cvHref = settings.cvFile?.downloadUrl || ABOUT_CV_FALLBACK.url;
-  const cvFilename = settings.cvFile?.filename || ABOUT_CV_FALLBACK.filename;
+  const cvDownload = settings.cvFile
+    ? {
+        href: settings.cvFile.downloadUrl,
+        filename: settings.cvFile.filename,
+      }
+    : ABOUT_CV_FALLBACK.available
+      ? {
+          href: ABOUT_CV_FALLBACK.url,
+          filename: ABOUT_CV_FALLBACK.filename,
+        }
+      : null;
 
   return (
     <SiteContainer>
@@ -182,14 +203,16 @@ export default async function AboutPage() {
               </nav>
             ) : null}
 
-            <a
-              className="button-primary about-cv-button"
-              href={cvHref}
-              download={cvFilename}
-            >
-              {content.cvCtaLabel}
-              <Download aria-hidden="true" size={17} strokeWidth={1.5} />
-            </a>
+            {cvDownload ? (
+              <a
+                className="button-primary about-cv-button"
+                href={cvDownload.href}
+                download={cvDownload.filename}
+              >
+                {content.cvCtaLabel}
+                <Download aria-hidden="true" size={17} strokeWidth={1.5} />
+              </a>
+            ) : null}
           </aside>
         </SectionReveal>
       </article>

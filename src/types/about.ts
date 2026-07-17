@@ -1,4 +1,5 @@
 import type { PortableTextBlock } from "@portabletext/react";
+import type { PageSeoContent } from "@/types/page-seo";
 
 export type AboutPortrait = {
   readonly url: string;
@@ -31,4 +32,5 @@ export type AboutContent = {
   readonly currentFocus: readonly AboutCurrentFocusEntry[];
   readonly availabilityText: string;
   readonly cvCtaLabel: string;
+  readonly seo: PageSeoContent;
 };
