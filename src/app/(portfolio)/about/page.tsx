@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { PortableText } from "@portabletext/react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { InitialRevealHeader, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
-import { aboutData } from "@/data/about";
+import { ABOUT_CV_FALLBACK } from "@/data/about";
 import { createPageMetadata } from "@/lib/seo";
 import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
+import { getAboutContent } from "@/sanity/lib/get-about";
 import { getSiteSettings } from "@/sanity/lib/get-site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,6 +23,19 @@ function SectionLabel({ number, children }: { number: string; children: React.Re
       <span>{number}</span>
       <span aria-hidden="true">/</span>
       <span>{children}</span>
+    </p>
+  );
+}
+
+function AboutSectionLabel({ value }: { value: string }) {
+  const [number, ...labelParts] = value.split("/").map((part) => part.trim());
+  const label = labelParts.join(" / ");
+
+  return label ? (
+    <SectionLabel number={number}>{label}</SectionLabel>
+  ) : (
+    <p className="section-label">
+      <span>{value}</span>
     </p>
   );
 }
@@ -41,25 +56,30 @@ function AboutLinkItem({ link }: { link: SiteLink }) {
 }
 
 export default async function AboutPage() {
-  const settings = await getSiteSettings();
+  const [settings, content] = await Promise.all([
+    getSiteSettings(),
+    getAboutContent(),
+  ]);
   const contactLinks = getSiteContactLinks(settings);
+  const cvHref = settings.cvFile?.downloadUrl || ABOUT_CV_FALLBACK.url;
+  const cvFilename = settings.cvFile?.filename || ABOUT_CV_FALLBACK.filename;
 
   return (
     <SiteContainer>
       <article className="about-page">
         <InitialRevealHeader className="about-hero">
           <div className="about-hero__copy">
-            <SectionLabel number="01">About</SectionLabel>
-            <h1>{aboutData.introduction}</h1>
-            <p>{aboutData.introductionDetail}</p>
+            <AboutSectionLabel value={content.sectionLabel} />
+            <h1>{content.mainHeading}</h1>
+            <p>{content.introduction}</p>
           </div>
 
           <figure className="about-hero__image">
             <Image
-              src={aboutData.image.src}
-              alt={aboutData.image.alt}
-              width={aboutData.image.width}
-              height={aboutData.image.height}
+              src={content.portrait.url}
+              alt={content.portrait.alt}
+              width={content.portrait.width}
+              height={content.portrait.height}
               sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1599px) 41vw, 656px"
               priority
             />
@@ -71,32 +91,34 @@ export default async function AboutPage() {
             <SectionLabel number="02">Background</SectionLabel>
             <h2 id="about-background-title">Thoughtful products, built end to end.</h2>
             <div className="about-background__copy">
-              {aboutData.biography.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
+              <PortableText value={[...content.biography]} onMissingComponent={false} />
             </div>
           </div>
 
           <aside className="about-education" aria-labelledby="education-title">
             <h3 id="education-title">Education</h3>
-            <dl>
-              <div>
-                <dt>Degree</dt>
-                <dd>{aboutData.education.qualification}</dd>
-              </div>
-              <div>
-                <dt>University</dt>
-                <dd>{aboutData.education.institution}</dd>
-              </div>
-              <div>
-                <dt>Result</dt>
-                <dd>{aboutData.education.classification}</dd>
-              </div>
-              <div>
-                <dt>Year</dt>
-                <dd>{aboutData.education.year}</dd>
-              </div>
-            </dl>
+            {content.education.map((entry, index) => (
+              <dl key={`${entry.qualification}-${entry.institution}-${index}`}>
+                <div>
+                  <dt>Degree</dt>
+                  <dd>{entry.qualification}</dd>
+                </div>
+                <div>
+                  <dt>University</dt>
+                  <dd>{entry.institution}</dd>
+                </div>
+                {entry.result ? (
+                  <div>
+                    <dt>Result</dt>
+                    <dd>{entry.result}</dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt>Year</dt>
+                  <dd>{entry.year}</dd>
+                </div>
+              </dl>
+            ))}
           </aside>
         </SectionReveal>
 
@@ -107,7 +129,7 @@ export default async function AboutPage() {
           </div>
 
           <ol className="about-build__list">
-            {aboutData.buildAreas.map((area, index) => (
+            {content.areasIBuild.map((area, index) => (
               <li key={area}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <h3>{area}</h3>
@@ -123,7 +145,7 @@ export default async function AboutPage() {
           </div>
 
           <ul className="about-capabilities__list">
-            {aboutData.capabilities.map((capability) => (
+            {content.capabilities.map((capability) => (
               <li key={capability}>{capability}</li>
             ))}
           </ul>
@@ -134,8 +156,11 @@ export default async function AboutPage() {
             <SectionLabel number="05">Current focus</SectionLabel>
             <h2 id="about-now-title">Learning through building.</h2>
             <ul>
-              {aboutData.currentFocus.map((focus) => (
-                <li key={focus}>{focus}</li>
+              {content.currentFocus.map((focus, index) => (
+                <li key={`${focus.title}-${index}`}>
+                  {focus.title}
+                  {focus.description ? ` — ${focus.description}` : null}
+                </li>
               ))}
             </ul>
           </div>
@@ -145,7 +170,7 @@ export default async function AboutPage() {
             <h2 id="availability-title">Based in London and ready for what comes next.</h2>
             <p className="about-availability__status">
               <span className="status-dot" aria-hidden="true" />
-              {settings.availabilityLabel}
+              {content.availabilityText}
             </p>
             <p className="about-availability__location">{settings.location}</p>
 
@@ -157,16 +182,14 @@ export default async function AboutPage() {
               </nav>
             ) : null}
 
-            {settings.cvFile ? (
-              <a
-                className="button-primary about-cv-button"
-                href={settings.cvFile.downloadUrl}
-                download={settings.cvFile.filename}
-              >
-                {aboutData.cvCallToActionLabel}
-                <Download aria-hidden="true" size={17} strokeWidth={1.5} />
-              </a>
-            ) : null}
+            <a
+              className="button-primary about-cv-button"
+              href={cvHref}
+              download={cvFilename}
+            >
+              {content.cvCtaLabel}
+              <Download aria-hidden="true" size={17} strokeWidth={1.5} />
+            </a>
           </aside>
         </SectionReveal>
       </article>
