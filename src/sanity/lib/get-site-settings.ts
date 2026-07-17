@@ -3,6 +3,10 @@ import "server-only";
 import { cache } from "react";
 import type { SanityImageSource } from "@sanity/image-url";
 import { siteSettingsFallback } from "@/config/site-fallback";
+import {
+  SANITY_CACHE_TAGS,
+  SANITY_REVALIDATE_SECONDS,
+} from "@/sanity/cache";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
@@ -17,8 +21,8 @@ import type {
   SiteSettings,
 } from "@/types/site-settings";
 
-export const SITE_SETTINGS_REVALIDATE_SECONDS = 3600;
-export const SITE_SETTINGS_CACHE_TAG = "sanity:siteSettings";
+export const SITE_SETTINGS_REVALIDATE_SECONDS = SANITY_REVALIDATE_SECONDS;
+export const SITE_SETTINGS_CACHE_TAG = SANITY_CACHE_TAGS.siteSettings;
 
 function logSiteSettingsFallback(reason: string): void {
   if (process.env.NODE_ENV !== "development") return;

@@ -7,6 +7,10 @@ import {
   homepageProjectFallback,
   projectPreviewPaths,
 } from "@/data/projects";
+import {
+  SANITY_CACHE_TAGS,
+  SANITY_REVALIDATE_SECONDS,
+} from "@/sanity/cache";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
@@ -20,8 +24,8 @@ import {
   type ProjectCategory,
 } from "@/types/project";
 
-export const PROJECTS_REVALIDATE_SECONDS = 3600;
-export const PROJECTS_CACHE_TAG = "sanity:projects";
+export const PROJECTS_REVALIDATE_SECONDS = SANITY_REVALIDATE_SECONDS;
+export const PROJECTS_CACHE_TAG = SANITY_CACHE_TAGS.projects;
 export const HOMEPAGE_PROJECT_LIMIT = 2;
 
 type ProjectDataResult = {

@@ -4,6 +4,10 @@ import type { PortableTextBlock } from "@portabletext/react";
 import type { SanityImageSource } from "@sanity/image-url";
 import { cache } from "react";
 import { aboutFallback } from "@/data/about";
+import {
+  SANITY_CACHE_TAGS,
+  SANITY_REVALIDATE_SECONDS,
+} from "@/sanity/cache";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
@@ -19,8 +23,8 @@ import type {
   AboutPortrait,
 } from "@/types/about";
 
-export const ABOUT_REVALIDATE_SECONDS = 3600;
-export const ABOUT_CACHE_TAG = "sanity:aboutPage";
+export const ABOUT_REVALIDATE_SECONDS = SANITY_REVALIDATE_SECONDS;
+export const ABOUT_CACHE_TAG = SANITY_CACHE_TAGS.aboutPage;
 
 type NormalizedAbout = {
   readonly content: AboutContent;

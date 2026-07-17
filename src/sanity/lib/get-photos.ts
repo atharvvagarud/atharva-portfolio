@@ -6,6 +6,10 @@ import {
   fallbackPhotoImage,
   fallbackPhotos,
 } from "@/data/photography";
+import {
+  SANITY_CACHE_TAGS,
+  SANITY_REVALIDATE_SECONDS,
+} from "@/sanity/cache";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
@@ -20,8 +24,8 @@ import {
   type PhotoCategory,
 } from "@/types/photo";
 
-export const PHOTOS_REVALIDATE_SECONDS = 3600;
-export const PHOTOS_CACHE_TAG = "sanity:photos";
+export const PHOTOS_REVALIDATE_SECONDS = SANITY_REVALIDATE_SECONDS;
+export const PHOTOS_CACHE_TAG = SANITY_CACHE_TAGS.photos;
 
 type PhotoDiagnostic = {
   readonly queryRan: boolean;

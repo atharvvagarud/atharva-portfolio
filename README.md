@@ -20,12 +20,13 @@ The integration uses public project identifiers only. No read or write token is 
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | Public Sanity project identifier used by Studio and published-content queries. |
 | `NEXT_PUBLIC_SANITY_DATASET` | Published dataset name; currently `production`. |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | Stable Sanity API date; currently `2026-06-01`. |
+| `SANITY_REVALIDATE_SECRET` | Server-only random secret that authenticates Sanity revalidation webhooks. |
 | `SITE_URL` | Static fallback for canonical URLs, sitemap, robots and the production Studio address. |
 | `SITE_EMAIL` | Static email fallback when Site Settings is unavailable. |
 | `GITHUB_URL` | Static GitHub fallback when Site Settings is unavailable. |
 | `LINKEDIN_URL` | Static LinkedIn fallback when Site Settings is unavailable. |
 
-Do not add Sanity API tokens to `NEXT_PUBLIC_*` variables. `.env.local` and other environment files are excluded by `.gitignore`.
+Do not add Sanity API tokens or `SANITY_REVALIDATE_SECRET` to `NEXT_PUBLIC_*` variables. `.env.local` and other environment files are excluded by `.gitignore`.
 
 ## Sanity configuration
 
@@ -62,9 +63,38 @@ The gallery, filters and viewer use the published collection order. Viewer Previ
 
 ## Caching and publishing
 
-All public Sanity queries use the published perspective and a 3,600-second revalidation period. A deployed edit may therefore take up to approximately one hour to appear without webhook revalidation. Cache tags are already attached to each content flow so a future webhook can invalidate individual document groups.
+All public Sanity queries use the published perspective and a 3,600-second revalidation period. The `/api/revalidate` webhook expires only the affected cache tags and page paths when Sanity content changes. The one-hour ISR period remains the fallback if a webhook is delayed or unavailable.
 
 Static fallbacks remain available for Site Settings, Homepage, About Page, Projects and Photography. Missing configuration, unpublished documents, empty collections and failed requests do not prevent public routes from rendering.
+
+### Configure on-demand revalidation
+
+1. Generate a long random value locally and set it as `SANITY_REVALIDATE_SECRET` in `.env.local`. Never commit the value.
+2. Add the same variable to the Production environment in Vercel, then redeploy so the route can read it.
+3. In Sanity Manage, open API → Webhooks and create a GROQ-powered webhook.
+4. Set the production URL to `https://atharvagarud.com/api/revalidate` and the HTTP method to `POST`.
+5. Select the `production` dataset and enable create, update and delete triggers. Leave draft and version document triggers disabled.
+6. Use this filter so unrelated document types do not trigger the endpoint:
+
+   ```groq
+   _type in ["siteSettings", "homepage", "aboutPage", "project", "photo"]
+   ```
+
+7. Use this minimal payload projection:
+
+   ```groq
+   {
+     "_type": _type,
+     "_id": _id
+   }
+   ```
+
+8. Add the custom HTTP header `Authorization: Bearer <SANITY_REVALIDATE_SECRET>`, substituting the configured value. Do not put the secret in the webhook URL or its GROQ payload. This endpoint uses the custom header directly, so the separate Sanity signature-secret field is not required. The endpoint also accepts `x-sanity-revalidation-secret`, but only one authentication header is needed.
+9. Save and enable the webhook. Sanity's attempts log should show a `200` response after a supported document is published, unpublished or deleted.
+
+For local testing, point a temporary webhook at a secure tunnel that forwards to `http://localhost:3000/api/revalidate`; Sanity cannot reach localhost directly. Use a separate development secret and remove the temporary webhook or tunnel after testing.
+
+To test production, publish a small content change in Studio, confirm the webhook attempt returned `200`, then load the affected public route in a fresh browser request. The response identifies the document type, invalidated tags and invalidated paths without returning the secret or document body.
 
 ## CV and images
 

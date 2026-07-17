@@ -3,6 +3,10 @@ import "server-only";
 import type { SanityImageSource } from "@sanity/image-url";
 import { cache } from "react";
 import { homepageFallback } from "@/data/homepage";
+import {
+  SANITY_CACHE_TAGS,
+  SANITY_REVALIDATE_SECONDS,
+} from "@/sanity/cache";
 import { sanityClient } from "@/sanity/client";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
@@ -25,8 +29,8 @@ import type {
 } from "@/types/homepage";
 import type { Project } from "@/types/project";
 
-export const HOMEPAGE_REVALIDATE_SECONDS = 3600;
-export const HOMEPAGE_CACHE_TAG = "sanity:homepage";
+export const HOMEPAGE_REVALIDATE_SECONDS = SANITY_REVALIDATE_SECONDS;
+export const HOMEPAGE_CACHE_TAG = SANITY_CACHE_TAGS.homepage;
 export const HOMEPAGE_STATISTIC_LIMIT = 3;
 export const HOMEPAGE_OFF_SCREEN_LIMIT = 4;
 
