@@ -30,12 +30,12 @@ Do not add Sanity API tokens or `SANITY_REVALIDATE_SECRET` to `NEXT_PUBLIC_*` va
 
 ## Sanity configuration
 
-The production Studio is available at `https://atharvagarud.com/studio`. If `SITE_URL` changes, use the equivalent `/studio` path on the new canonical origin.
+The production Studio is available at `https://atharva-portfolio-gold.vercel.app/studio`. If `SITE_URL` changes, use the equivalent `/studio` path on the new canonical origin.
 
 Add these origins in Sanity Manage under API → CORS origins, with credentials enabled because Studio authentication requires them:
 
 - `http://localhost:3000`
-- `https://atharvagarud.com`
+- `https://atharva-portfolio-gold.vercel.app`
 
 Add any actively used Vercel preview origin separately. Do not use an unrestricted wildcard origin.
 
@@ -72,7 +72,7 @@ Static fallbacks remain available for Site Settings, Homepage, About Page, Proje
 1. Generate a long random value locally and set it as `SANITY_REVALIDATE_SECRET` in `.env.local`. Never commit the value.
 2. Add the same variable to the Production environment in Vercel, then redeploy so the route can read it.
 3. In Sanity Manage, open API → Webhooks and create a GROQ-powered webhook.
-4. Set the production URL to `https://atharvagarud.com/api/revalidate` and the HTTP method to `POST`.
+4. Set the production URL to `https://atharva-portfolio-gold.vercel.app/api/revalidate` and the HTTP method to `POST`.
 5. Select the `production` dataset and enable create, update and delete triggers. Leave draft and version document triggers disabled.
 6. Use this filter so unrelated document types do not trigger the endpoint:
 

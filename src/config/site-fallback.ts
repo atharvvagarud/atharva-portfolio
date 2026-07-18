@@ -1,6 +1,6 @@
 import type { SiteSettings } from "@/types/site-settings";
 
-const DEFAULT_SITE_URL = "https://atharvagarud.com";
+const DEFAULT_SITE_URL = "https://atharva-portfolio-gold.vercel.app";
 
 function optionalHttpUrl(value: string | undefined): string | null {
   const candidate = value?.trim();
