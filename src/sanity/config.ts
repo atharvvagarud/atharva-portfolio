@@ -27,9 +27,10 @@ const sanityConfig = defineConfig({
       name: "preview",
       title: "Preview",
       previewUrl: {
-        origin: presentationPreviewOrigin,
+        initial: presentationPreviewOrigin,
         previewMode: {
           enable: "/api/draft-mode/enable",
+          disable: "/api/draft-mode/disable",
           shareAccess: false,
         },
       },

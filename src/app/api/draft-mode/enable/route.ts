@@ -47,15 +47,17 @@ function isNextRedirect(error: unknown): boolean {
 
 function logPresentationHandshake({
   requestUrl,
-  viewerTokenConfigured,
   validationSucceeded,
+  resolvedRedirectPathname,
+  draftModeEnabled,
 }: {
   requestUrl: URL;
-  viewerTokenConfigured: boolean;
   validationSucceeded: boolean;
+  resolvedRedirectPathname: string;
+  draftModeEnabled: boolean;
 }) {
   console.info(
-    `[sanity-preview] handshake secret=${requestUrl.searchParams.has("sanity-preview-secret")} pathname=${requestUrl.searchParams.has("sanity-preview-pathname")} perspective=${requestUrl.searchParams.has("sanity-preview-perspective")} viewerToken=${viewerTokenConfigured} validated=${validationSucceeded}`,
+    `[sanity-preview] handshake=true secret=${requestUrl.searchParams.has("sanity-preview-secret")} pathname=${requestUrl.searchParams.has("sanity-preview-pathname")} validated=${validationSucceeded} redirect=${resolvedRedirectPathname} draftMode=${draftModeEnabled}`,
   );
 }
 
@@ -63,11 +65,17 @@ async function handlePresentationHandshake(
   request: Request,
   requestUrl: URL,
 ) {
+  const redirect = safeRedirect(
+    requestUrl.searchParams.get("sanity-preview-pathname"),
+  );
+  const resolvedRedirectPathname = redirect ?? "rejected";
+
   if (!presentationDraftMode) {
     logPresentationHandshake({
       requestUrl,
-      viewerTokenConfigured: false,
       validationSucceeded: false,
+      resolvedRedirectPathname,
+      draftModeEnabled: false,
     });
 
     return NextResponse.json(
@@ -76,35 +84,42 @@ async function handlePresentationHandshake(
     );
   }
 
-  const redirect = safeRedirect(
-    requestUrl.searchParams.get("sanity-preview-pathname"),
-  );
-
   try {
     const response = await presentationDraftMode.GET(request);
     logPresentationHandshake({
       requestUrl,
-      viewerTokenConfigured: true,
       validationSucceeded: false,
+      resolvedRedirectPathname,
+      draftModeEnabled: false,
     });
     return response;
   } catch (error) {
     const validationSucceeded = isNextRedirect(error);
-    logPresentationHandshake({
-      requestUrl,
-      viewerTokenConfigured: true,
-      validationSucceeded,
-    });
 
     if (validationSucceeded && !redirect) {
       const draft = await draftMode();
       draft.disable();
+
+      logPresentationHandshake({
+        requestUrl,
+        validationSucceeded: true,
+        resolvedRedirectPathname,
+        draftModeEnabled: false,
+      });
 
       return NextResponse.json(
         { enabled: false, error: "Invalid preview redirect." },
         { status: 400 },
       );
     }
+
+    const draft = await draftMode();
+    logPresentationHandshake({
+      requestUrl,
+      validationSucceeded,
+      resolvedRedirectPathname,
+      draftModeEnabled: validationSucceeded && draft.isEnabled,
+    });
 
     throw error;
   }
