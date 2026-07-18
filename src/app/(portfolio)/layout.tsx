@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { PreviewIndicator } from "@/components/preview-indicator";
 import { SiteHeader } from "@/components/site-header";
@@ -134,7 +135,12 @@ export default async function PortfolioLayout({
       </a>
       <SiteHeader />
       <main id="main-content">{children}</main>
-      {isDraftMode ? <PreviewIndicator /> : null}
+      {isDraftMode ? (
+        <>
+          <PreviewIndicator />
+          <VisualEditing />
+        </>
+      ) : null}
     </SmoothScrollProvider>
   );
 }

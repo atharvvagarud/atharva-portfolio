@@ -1,8 +1,10 @@
 import "server-only";
 
 import { createHash, timingSafeEqual } from "node:crypto";
+import { defineEnableDraftMode } from "next-sanity/draft-mode";
 import { draftMode } from "next/headers";
 import { NextResponse } from "next/server";
+import { sanityPreviewClient } from "@/sanity/client";
 
 export const runtime = "nodejs";
 
@@ -12,6 +14,10 @@ const allowedRedirects = new Set([
   "/projects",
   "/photography",
 ]);
+
+const presentationDraftMode = sanityPreviewClient
+  ? defineEnableDraftMode({ client: sanityPreviewClient })
+  : null;
 
 function safeRedirect(value: string | null): string | null {
   if (!value) return "/";
@@ -25,18 +31,47 @@ function secretsMatch(supplied: string, expected: string): boolean {
 }
 
 export async function GET(request: Request) {
-  const previewSecret = process.env.SANITY_PREVIEW_SECRET?.trim();
-  if (!previewSecret) {
+  const requestUrl = new URL(request.url);
+  const presentationSecret = requestUrl.searchParams.get(
+    "sanity-preview-secret",
+  );
+
+  if (presentationSecret) {
+    const redirect = safeRedirect(
+      requestUrl.searchParams.get("sanity-preview-pathname"),
+    );
+
+    if (!redirect) {
+      return NextResponse.json(
+        { enabled: false, error: "Invalid preview redirect." },
+        { status: 400 },
+      );
+    }
+
+    if (!presentationDraftMode) {
+      return NextResponse.json(
+        { enabled: false, error: "Preview is not configured." },
+        { status: 503 },
+      );
+    }
+
+    return presentationDraftMode.GET(request);
+  }
+
+  const manualPreviewSecret = process.env.SANITY_PREVIEW_SECRET?.trim();
+  if (!manualPreviewSecret) {
     return NextResponse.json(
       { enabled: false, error: "Preview is not configured." },
       { status: 503 },
     );
   }
 
-  const requestUrl = new URL(request.url);
   const suppliedSecret = requestUrl.searchParams.get("secret")?.trim();
 
-  if (!suppliedSecret || !secretsMatch(suppliedSecret, previewSecret)) {
+  if (
+    !suppliedSecret ||
+    !secretsMatch(suppliedSecret, manualPreviewSecret)
+  ) {
     return NextResponse.json(
       { enabled: false, error: "Unauthorized." },
       { status: 401 },

@@ -1,11 +1,19 @@
 "use client";
 
 import { defineConfig } from "sanity";
+import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { studioDataset, studioProjectId } from "@/sanity/env";
 import { schemaTypes } from "@/sanity/schemaTypes";
 import { singletonTypes } from "@/sanity/singletons";
 import { structure } from "@/sanity/structure";
+import {
+  LOCAL_PREVIEW_ORIGIN,
+  presentationLocations,
+  presentationMainDocuments,
+  presentationPreviewOrigin,
+  PRODUCTION_PREVIEW_ORIGIN,
+} from "@/sanity/presentation";
 
 const sanityConfig = defineConfig({
   name: "default",
@@ -13,7 +21,25 @@ const sanityConfig = defineConfig({
   basePath: "/studio",
   projectId: studioProjectId,
   dataset: studioDataset,
-  plugins: [structureTool({ structure })],
+  plugins: [
+    structureTool({ structure }),
+    presentationTool({
+      name: "preview",
+      title: "Preview",
+      previewUrl: {
+        initial: presentationPreviewOrigin,
+        previewMode: {
+          enable: "/api/draft-mode/enable",
+          shareAccess: false,
+        },
+      },
+      allowOrigins: [LOCAL_PREVIEW_ORIGIN, PRODUCTION_PREVIEW_ORIGIN],
+      resolve: {
+        mainDocuments: presentationMainDocuments,
+        locations: presentationLocations,
+      },
+    }),
+  ],
   schema: {
     types: schemaTypes,
     templates: (templates) =>

@@ -100,25 +100,46 @@ To test production, publish a small content change in Studio, confirm the webhoo
 
 ## Draft Mode preview
 
-Draft Mode lets an authenticated editor view unpublished Site Settings, Homepage, About Page, Project and Photography changes on the real portfolio routes. It does not enable Visual Editing, click-to-edit overlays or the Presentation Tool.
+Draft Mode lets an authenticated editor view unpublished Site Settings, Homepage, About Page, Project and Photography changes on the real portfolio routes. The embedded Studio includes a `Preview` Presentation workspace, but the frontend does not enable Visual Editing, stega encoding or click-to-edit overlays.
 
 ### Create preview credentials
 
 1. In Sanity Manage, open the project and go to API → Tokens.
 2. Create a token with the built-in Viewer role, name it for portfolio preview use, and copy it when shown. Viewer access is read-only; do not create an Editor or write token for this feature.
 3. Store that value as `SANITY_API_READ_TOKEN`.
-4. Generate an independent preview secret, for example with `openssl rand -hex 32`, and store it as `SANITY_PREVIEW_SECRET`.
+4. Generate an independent manual-preview fallback secret, for example with `openssl rand -hex 32`, and store it as `SANITY_PREVIEW_SECRET`.
 5. Keep both values server-only and never commit them.
 
 For local development, add both values to `.env.local` and restart `pnpm dev`. In Vercel, add both variables to the environments where preview should work, then redeploy. Do not expose either variable through a `NEXT_PUBLIC_*` name.
 
-Enable preview by opening a URL in this format:
+### Use the Studio Preview workspace
+
+1. Start the frontend and open `http://localhost:3000/studio`, or open `https://atharva-portfolio-gold.vercel.app/studio` in production.
+2. Sign in with a Sanity account that has access to the project.
+3. Select `Preview` in the Studio tool navigation.
+4. The Presentation Tool creates a short-lived Sanity preview-secret document, calls `/api/draft-mode/enable`, and loads the frontend with Draft Mode enabled. Editors do not enter or see `SANITY_PREVIEW_SECRET` during this handshake.
+5. Navigate normally within the embedded frontend between `/`, `/about`, `/projects` and `/photography`.
+6. Selecting Site Settings or Homepage resolves to `/`; About Page resolves to `/about`; Project documents resolve to `/projects`; Photo documents resolve to `/photography`.
+7. Use the frontend `Exit preview` button to clear Draft Mode and return to published content.
+
+Development Studio builds use `http://localhost:3000` as the preview origin. Production Studio builds use `https://atharva-portfolio-gold.vercel.app`. Both exact origins are configured in Presentation's `allowOrigins`; no wildcard origin is used.
+
+Keep both origins in Sanity Manage → API → CORS Origins with credentials enabled:
+
+- `http://localhost:3000`
+- `https://atharva-portfolio-gold.vercel.app`
+
+No additional origin is required for the current embedded Studio. Add an exact Vercel preview deployment origin only when actively using that deployment for Studio preview.
+
+### Manual preview fallback
+
+The existing manual endpoint remains available as a temporary fallback:
 
 ```text
 https://atharva-portfolio-gold.vercel.app/api/draft-mode/enable?secret=YOUR_PREVIEW_SECRET&redirect=/
 ```
 
-The only supported redirect values are `/`, `/about`, `/projects` and `/photography`. Replace the redirect value to open another supported page. Do not share, bookmark, screenshot or place preview URLs containing the secret in Studio content, analytics or public documentation.
+The only supported redirect values are `/`, `/about`, `/projects` and `/photography`. Replace the redirect value to open another supported page. Do not share, bookmark, screenshot or place manual preview URLs containing the secret in Studio content, analytics or public documentation.
 
 Once enabled, a fixed indicator identifies unpublished preview content. Use its `Exit preview` button to submit a non-prefetched POST request to `/api/draft-mode/disable`; this clears the Draft Mode cookie and returns to the published homepage.
 
