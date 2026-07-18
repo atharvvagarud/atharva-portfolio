@@ -9,9 +9,9 @@ import { singletonTypes } from "@/sanity/singletons";
 import { structure } from "@/sanity/structure";
 import {
   LOCAL_PREVIEW_ORIGIN,
+  presentationInitialUrl,
   presentationLocations,
   presentationMainDocuments,
-  presentationPreviewOrigin,
   PRODUCTION_PREVIEW_ORIGIN,
 } from "@/sanity/presentation";
 
@@ -24,10 +24,11 @@ const sanityConfig = defineConfig({
   plugins: [
     structureTool({ structure }),
     presentationTool({
-      name: "preview",
+      // The standard tool route invalidates legacy `/studio/preview` URL state.
+      name: "presentation",
       title: "Preview",
       previewUrl: {
-        initial: presentationPreviewOrigin,
+        initial: presentationInitialUrl,
         previewMode: {
           enable: "/api/draft-mode/enable",
           disable: "/api/draft-mode/disable",

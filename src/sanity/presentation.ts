@@ -12,6 +12,11 @@ export const presentationPreviewOrigin =
     ? LOCAL_PREVIEW_ORIGIN
     : PRODUCTION_PREVIEW_ORIGIN;
 
+export const presentationInitialUrl = new URL(
+  "/",
+  presentationPreviewOrigin,
+).toString();
+
 export const presentationMainDocuments = defineDocuments([
   { route: "/", type: "homepage" },
   { route: "/about", type: "aboutPage" },
