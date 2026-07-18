@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "next-sanity";
 import {
   apiVersion,
@@ -14,5 +16,16 @@ export const sanityClient =
         apiVersion,
         useCdn: true,
         perspective: "published",
+      })
+    : null;
+
+const sanityApiReadToken = process.env.SANITY_API_READ_TOKEN?.trim() || null;
+
+export const sanityPreviewClient =
+  sanityClient && sanityApiReadToken
+    ? sanityClient.withConfig({
+        token: sanityApiReadToken,
+        useCdn: false,
+        perspective: "drafts",
       })
     : null;

@@ -13,7 +13,7 @@ The public site is available at `http://localhost:3000`. The embedded Studio is 
 
 ## Environment variables
 
-The integration uses public project identifiers only. No read or write token is required for published content.
+Published content uses public project identifiers only. Draft Mode additionally uses a server-only read token; no write token is required.
 
 | Variable | Purpose |
 | --- | --- |
@@ -21,12 +21,14 @@ The integration uses public project identifiers only. No read or write token is 
 | `NEXT_PUBLIC_SANITY_DATASET` | Published dataset name; currently `production`. |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | Stable Sanity API date; currently `2026-06-01`. |
 | `SANITY_REVALIDATE_SECRET` | Server-only random secret that authenticates Sanity revalidation webhooks. |
+| `SANITY_API_READ_TOKEN` | Server-only Sanity token with Viewer access for reading draft documents. |
+| `SANITY_PREVIEW_SECRET` | Server-only random secret that protects the Draft Mode enable endpoint. |
 | `SITE_URL` | Static fallback for canonical URLs, sitemap, robots and the production Studio address. |
 | `SITE_EMAIL` | Static email fallback when Site Settings is unavailable. |
 | `GITHUB_URL` | Static GitHub fallback when Site Settings is unavailable. |
 | `LINKEDIN_URL` | Static LinkedIn fallback when Site Settings is unavailable. |
 
-Do not add Sanity API tokens or `SANITY_REVALIDATE_SECRET` to `NEXT_PUBLIC_*` variables. `.env.local` and other environment files are excluded by `.gitignore`.
+Do not add Sanity API tokens, `SANITY_PREVIEW_SECRET` or `SANITY_REVALIDATE_SECRET` to `NEXT_PUBLIC_*` variables. `.env.local` and other environment files are excluded by `.gitignore`.
 
 ## Sanity configuration
 
@@ -95,6 +97,34 @@ Static fallbacks remain available for Site Settings, Homepage, About Page, Proje
 For local testing, point a temporary webhook at a secure tunnel that forwards to `http://localhost:3000/api/revalidate`; Sanity cannot reach localhost directly. Use a separate development secret and remove the temporary webhook or tunnel after testing.
 
 To test production, publish a small content change in Studio, confirm the webhook attempt returned `200`, then load the affected public route in a fresh browser request. The response identifies the document type, invalidated tags and invalidated paths without returning the secret or document body.
+
+## Draft Mode preview
+
+Draft Mode lets an authenticated editor view unpublished Site Settings, Homepage, About Page, Project and Photography changes on the real portfolio routes. It does not enable Visual Editing, click-to-edit overlays or the Presentation Tool.
+
+### Create preview credentials
+
+1. In Sanity Manage, open the project and go to API → Tokens.
+2. Create a token with the built-in Viewer role, name it for portfolio preview use, and copy it when shown. Viewer access is read-only; do not create an Editor or write token for this feature.
+3. Store that value as `SANITY_API_READ_TOKEN`.
+4. Generate an independent preview secret, for example with `openssl rand -hex 32`, and store it as `SANITY_PREVIEW_SECRET`.
+5. Keep both values server-only and never commit them.
+
+For local development, add both values to `.env.local` and restart `pnpm dev`. In Vercel, add both variables to the environments where preview should work, then redeploy. Do not expose either variable through a `NEXT_PUBLIC_*` name.
+
+Enable preview by opening a URL in this format:
+
+```text
+https://atharva-portfolio-gold.vercel.app/api/draft-mode/enable?secret=YOUR_PREVIEW_SECRET&redirect=/
+```
+
+The only supported redirect values are `/`, `/about`, `/projects` and `/photography`. Replace the redirect value to open another supported page. Do not share, bookmark, screenshot or place preview URLs containing the secret in Studio content, analytics or public documentation.
+
+Once enabled, a fixed indicator identifies unpublished preview content. Use its `Exit preview` button to submit a non-prefetched POST request to `/api/draft-mode/disable`; this clears the Draft Mode cookie and returns to the published homepage.
+
+Preview requests use Sanity's `drafts` perspective, the read token, the live API and `no-store` request caching. Public requests continue using the `published` perspective, CDN delivery, cache tags, webhook revalidation and the 3,600-second ISR fallback. The public project and photo queries still require their custom `Published` field; preview queries deliberately include false or missing values.
+
+To verify isolation, open preview in one browser profile and leave a private window outside preview. Draft changes should appear only in the first profile. After using `Exit preview`, both profiles should show the currently published content.
 
 ## CV and images
 

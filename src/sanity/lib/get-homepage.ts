@@ -7,9 +7,11 @@ import {
   SANITY_CACHE_TAGS,
   SANITY_REVALIDATE_SECONDS,
 } from "@/sanity/cache";
-import { sanityClient } from "@/sanity/client";
-import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import {
+  getSanityFetchContext,
+  getSanityFetchOptions,
+} from "@/sanity/lib/get-fetch-context";
 import {
   getHomepageProjects,
   HOMEPAGE_PROJECT_LIMIT,
@@ -282,28 +284,23 @@ function logHomepageDiagnostic({
 
 async function fetchHomepageContent(siteLocation?: string): Promise<HomepageContent> {
   const fallback = createHomepageFallback(siteLocation);
+  const context = await getSanityFetchContext();
 
-  if (!isSanityConfigured || !sanityClient) {
+  if (!context.client) {
     logHomepageDiagnostic({
       queryRan: false,
       singletonFound: false,
       fallbackUsed: true,
-      reason: "sanity-not-configured",
+      reason: context.unavailableReason || "sanity-not-configured",
     });
     return fallback;
   }
 
   try {
-    const result = await sanityClient.fetch<HomepageQueryResult | null>(
+    const result = await context.client.fetch<HomepageQueryResult | null>(
       homepageQuery,
-      {},
-      {
-        perspective: "published",
-        next: {
-          revalidate: HOMEPAGE_REVALIDATE_SECONDS,
-          tags: [HOMEPAGE_CACHE_TAG],
-        },
-      },
+      { includeUnpublished: context.isDraftMode },
+      getSanityFetchOptions(context, HOMEPAGE_CACHE_TAG),
     );
 
     if (!result) {
@@ -311,7 +308,9 @@ async function fetchHomepageContent(siteLocation?: string): Promise<HomepageCont
         queryRan: true,
         singletonFound: false,
         fallbackUsed: true,
-        reason: "published-singleton-not-found",
+        reason: context.isDraftMode
+          ? "preview-singleton-not-found"
+          : "published-singleton-not-found",
       });
       return fallback;
     }

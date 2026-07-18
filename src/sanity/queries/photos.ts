@@ -43,7 +43,10 @@ export type PhotosQueryResult = {
 };
 
 export const photosQuery = defineQuery(`
-  *[_type == "photo" && coalesce(published, false) == true]
+  *[
+    _type == "photo" &&
+    ($includeUnpublished == true || coalesce(published, false) == true)
+  ]
     | order(displayOrder asc, year desc, title asc) {
       _id,
       title,

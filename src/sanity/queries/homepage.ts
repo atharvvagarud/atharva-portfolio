@@ -52,7 +52,8 @@ export const homepageQuery = defineQuery(`
     secondaryIntroduction,
     locationLabel,
     "selectedProjects": selectedProjects[]->[
-      _type == "project" && coalesce(published, false) == true
+      _type == "project" &&
+      ($includeUnpublished == true || coalesce(published, false) == true)
     ] {
       _id,
       title,

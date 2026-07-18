@@ -8,9 +8,11 @@ import {
   SANITY_CACHE_TAGS,
   SANITY_REVALIDATE_SECONDS,
 } from "@/sanity/cache";
-import { sanityClient } from "@/sanity/client";
-import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import {
+  getSanityFetchContext,
+  getSanityFetchOptions,
+} from "@/sanity/lib/get-fetch-context";
 import { normalizePageSeo } from "@/sanity/lib/normalize-page-seo";
 import {
   aboutQuery,
@@ -277,27 +279,23 @@ function logAboutDiagnostic({
 }
 
 async function fetchAboutContent(): Promise<AboutContent> {
-  if (!isSanityConfigured || !sanityClient) {
+  const context = await getSanityFetchContext();
+
+  if (!context.client) {
     logAboutDiagnostic({
       queryRan: false,
       singletonFound: false,
       fallbackUsed: true,
-      reason: "sanity-not-configured",
+      reason: context.unavailableReason || "sanity-not-configured",
     });
     return aboutFallback;
   }
 
   try {
-    const result = await sanityClient.fetch<AboutQueryResult | null>(
+    const result = await context.client.fetch<AboutQueryResult | null>(
       aboutQuery,
       {},
-      {
-        perspective: "published",
-        next: {
-          revalidate: ABOUT_REVALIDATE_SECONDS,
-          tags: [ABOUT_CACHE_TAG],
-        },
-      },
+      getSanityFetchOptions(context, ABOUT_CACHE_TAG),
     );
 
     if (!result) {
@@ -305,7 +303,9 @@ async function fetchAboutContent(): Promise<AboutContent> {
         queryRan: true,
         singletonFound: false,
         fallbackUsed: true,
-        reason: "published-singleton-not-found",
+        reason: context.isDraftMode
+          ? "preview-singleton-not-found"
+          : "published-singleton-not-found",
       });
       return aboutFallback;
     }

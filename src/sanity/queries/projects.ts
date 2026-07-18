@@ -45,7 +45,10 @@ export type ProjectsQueryResult = {
 };
 
 export const projectsQuery = defineQuery(`
-  *[_type == "project" && coalesce(published, false) == true]
+  *[
+    _type == "project" &&
+    ($includeUnpublished == true || coalesce(published, false) == true)
+  ]
     | order(displayOrder asc, year desc, title asc) {
       _id,
       title,

@@ -10,9 +10,11 @@ import {
   SANITY_CACHE_TAGS,
   SANITY_REVALIDATE_SECONDS,
 } from "@/sanity/cache";
-import { sanityClient } from "@/sanity/client";
-import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import {
+  getSanityFetchContext,
+  getSanityFetchOptions,
+} from "@/sanity/lib/get-fetch-context";
 import {
   photosQuery,
   type PhotosQueryImage,
@@ -35,6 +37,7 @@ type PhotoDiagnostic = {
   readonly reason:
     | "none"
     | "sanity-not-configured"
+    | "preview-not-configured"
     | "no-matching-documents"
     | "normalization-rejected-all"
     | "normalization-rejected-some"
@@ -176,28 +179,24 @@ function normalizePhoto(value: PhotosQueryResult): Photo | null {
 }
 
 async function fetchPhotos(): Promise<readonly Photo[]> {
-  if (!isSanityConfigured || !sanityClient) {
+  const context = await getSanityFetchContext();
+
+  if (!context.client) {
     logPhotoDiagnostic({
       queryRan: false,
       returnedCount: 0,
       acceptedCount: 0,
       fallbackUsed: true,
-      reason: "sanity-not-configured",
+      reason: context.unavailableReason || "sanity-not-configured",
     });
     return fallbackPhotos;
   }
 
   try {
-    const result = await sanityClient.fetch<readonly PhotosQueryResult[]>(
+    const result = await context.client.fetch<readonly PhotosQueryResult[]>(
       photosQuery,
-      {},
-      {
-        perspective: "published",
-        next: {
-          revalidate: PHOTOS_REVALIDATE_SECONDS,
-          tags: [PHOTOS_CACHE_TAG],
-        },
-      },
+      { includeUnpublished: context.isDraftMode },
+      getSanityFetchOptions(context, PHOTOS_CACHE_TAG),
     );
     const photos = result
       .map(normalizePhoto)

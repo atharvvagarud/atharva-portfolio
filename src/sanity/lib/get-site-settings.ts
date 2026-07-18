@@ -7,9 +7,11 @@ import {
   SANITY_CACHE_TAGS,
   SANITY_REVALIDATE_SECONDS,
 } from "@/sanity/cache";
-import { sanityClient } from "@/sanity/client";
-import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import {
+  getSanityFetchContext,
+  getSanityFetchOptions,
+} from "@/sanity/lib/get-fetch-context";
 import {
   siteSettingsQuery,
   type SiteSettingsQueryImage,
@@ -166,26 +168,26 @@ function normalizeSiteSettings(value: SiteSettingsQueryResult): SiteSettings {
 }
 
 async function fetchSiteSettings(): Promise<SiteSettings> {
-  if (!isSanityConfigured || !sanityClient) {
-    logSiteSettingsFallback("sanity-not-configured");
+  const context = await getSanityFetchContext();
+
+  if (!context.client) {
+    logSiteSettingsFallback(context.unavailableReason || "sanity-not-configured");
     return siteSettingsFallback;
   }
 
   try {
-    const result = await sanityClient.fetch<SiteSettingsQueryResult | null>(
+    const result = await context.client.fetch<SiteSettingsQueryResult | null>(
       siteSettingsQuery,
       {},
-      {
-        perspective: "published",
-        next: {
-          revalidate: SITE_SETTINGS_REVALIDATE_SECONDS,
-          tags: [SITE_SETTINGS_CACHE_TAG],
-        },
-      },
+      getSanityFetchOptions(context, SITE_SETTINGS_CACHE_TAG),
     );
 
     if (!result) {
-      logSiteSettingsFallback("published-singleton-not-found");
+      logSiteSettingsFallback(
+        context.isDraftMode
+          ? "preview-singleton-not-found"
+          : "published-singleton-not-found",
+      );
       return siteSettingsFallback;
     }
 

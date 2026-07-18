@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
+import { PreviewIndicator } from "@/components/preview-indicator";
 import { SiteHeader } from "@/components/site-header";
 import { pageSeo, siteOwnerName } from "@/config/site";
 import { siteSettingsFallback } from "@/config/site-fallback";
@@ -17,6 +19,7 @@ function validMetadataBase(value: string): URL {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const { isEnabled: isDraftMode } = await draftMode();
   const settings = await getSiteSettings();
   const image = settings.defaultOpenGraphImage;
 
@@ -55,17 +58,19 @@ export async function generateMetadata(): Promise<Metadata> {
       description: settings.defaultSeoDescription,
       images: [image.url],
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1,
-      },
-    },
+    robots: isDraftMode
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
+        },
     icons: {
       icon: [
         {
@@ -85,6 +90,7 @@ export default async function PortfolioLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isEnabled: isDraftMode } = await draftMode();
   const settings = await getSiteSettings();
   const personSameAs = [
     settings.githubUrl,
@@ -128,6 +134,7 @@ export default async function PortfolioLayout({
       </a>
       <SiteHeader />
       <main id="main-content">{children}</main>
+      {isDraftMode ? <PreviewIndicator /> : null}
     </SmoothScrollProvider>
   );
 }

@@ -11,9 +11,11 @@ import {
   SANITY_CACHE_TAGS,
   SANITY_REVALIDATE_SECONDS,
 } from "@/sanity/cache";
-import { sanityClient } from "@/sanity/client";
-import { isSanityConfigured } from "@/sanity/env";
 import { sanityImageBuilder } from "@/sanity/image";
+import {
+  getSanityFetchContext,
+  getSanityFetchOptions,
+} from "@/sanity/lib/get-fetch-context";
 import {
   projectsQuery,
   type ProjectsQueryResult,
@@ -41,6 +43,7 @@ type ProjectDiagnostic = {
   readonly reason:
     | "none"
     | "sanity-not-configured"
+    | "preview-not-configured"
     | "no-matching-documents"
     | "normalization-rejected-all"
     | "normalization-rejected-some"
@@ -181,28 +184,24 @@ export function normalizeProject(value: ProjectsQueryResult): Project | null {
 }
 
 async function fetchProjectData(): Promise<ProjectDataResult> {
-  if (!isSanityConfigured || !sanityClient) {
+  const context = await getSanityFetchContext();
+
+  if (!context.client) {
     logProjectDiagnostic({
       queryRan: false,
       returnedCount: 0,
       acceptedCount: 0,
       fallbackUsed: true,
-      reason: "sanity-not-configured",
+      reason: context.unavailableReason || "sanity-not-configured",
     });
     return { projects: fallbackProjects, source: "fallback" };
   }
 
   try {
-    const result = await sanityClient.fetch<readonly ProjectsQueryResult[]>(
+    const result = await context.client.fetch<readonly ProjectsQueryResult[]>(
       projectsQuery,
-      {},
-      {
-        perspective: "published",
-        next: {
-          revalidate: PROJECTS_REVALIDATE_SECONDS,
-          tags: [PROJECTS_CACHE_TAG],
-        },
-      },
+      { includeUnpublished: context.isDraftMode },
+      getSanityFetchOptions(context, PROJECTS_CACHE_TAG),
     );
     const projects = result
       .map(normalizeProject)
