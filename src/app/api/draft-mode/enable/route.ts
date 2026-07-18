@@ -19,6 +19,12 @@ const presentationDraftMode = sanityPreviewClient
   ? defineEnableDraftMode({ client: sanityPreviewClient })
   : null;
 
+const presentationParameterNames = [
+  "sanity-preview-secret",
+  "sanity-preview-pathname",
+  "sanity-preview-perspective",
+] as const;
+
 function safeRedirect(value: string | null): string | null {
   if (!value) return "/";
   return allowedRedirects.has(value) ? value : null;
@@ -30,32 +36,88 @@ function secretsMatch(supplied: string, expected: string): boolean {
   return timingSafeEqual(suppliedDigest, expectedDigest);
 }
 
-export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const presentationSecret = requestUrl.searchParams.get(
-    "sanity-preview-secret",
+function isNextRedirect(error: unknown): boolean {
+  if (!error || typeof error !== "object" || !("digest" in error)) {
+    return false;
+  }
+
+  const { digest } = error as { digest?: unknown };
+  return typeof digest === "string" && digest.startsWith("NEXT_REDIRECT");
+}
+
+function logPresentationHandshake({
+  requestUrl,
+  viewerTokenConfigured,
+  validationSucceeded,
+}: {
+  requestUrl: URL;
+  viewerTokenConfigured: boolean;
+  validationSucceeded: boolean;
+}) {
+  console.info(
+    `[sanity-preview] handshake secret=${requestUrl.searchParams.has("sanity-preview-secret")} pathname=${requestUrl.searchParams.has("sanity-preview-pathname")} perspective=${requestUrl.searchParams.has("sanity-preview-perspective")} viewerToken=${viewerTokenConfigured} validated=${validationSucceeded}`,
+  );
+}
+
+async function handlePresentationHandshake(
+  request: Request,
+  requestUrl: URL,
+) {
+  if (!presentationDraftMode) {
+    logPresentationHandshake({
+      requestUrl,
+      viewerTokenConfigured: false,
+      validationSucceeded: false,
+    });
+
+    return NextResponse.json(
+      { enabled: false, error: "Preview is not configured." },
+      { status: 503 },
+    );
+  }
+
+  const redirect = safeRedirect(
+    requestUrl.searchParams.get("sanity-preview-pathname"),
   );
 
-  if (presentationSecret) {
-    const redirect = safeRedirect(
-      requestUrl.searchParams.get("sanity-preview-pathname"),
-    );
+  try {
+    const response = await presentationDraftMode.GET(request);
+    logPresentationHandshake({
+      requestUrl,
+      viewerTokenConfigured: true,
+      validationSucceeded: false,
+    });
+    return response;
+  } catch (error) {
+    const validationSucceeded = isNextRedirect(error);
+    logPresentationHandshake({
+      requestUrl,
+      viewerTokenConfigured: true,
+      validationSucceeded,
+    });
 
-    if (!redirect) {
+    if (validationSucceeded && !redirect) {
+      const draft = await draftMode();
+      draft.disable();
+
       return NextResponse.json(
         { enabled: false, error: "Invalid preview redirect." },
         { status: 400 },
       );
     }
 
-    if (!presentationDraftMode) {
-      return NextResponse.json(
-        { enabled: false, error: "Preview is not configured." },
-        { status: 503 },
-      );
-    }
+    throw error;
+  }
+}
 
-    return presentationDraftMode.GET(request);
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url);
+  const isPresentationHandshake = presentationParameterNames.some(
+    (parameterName) => requestUrl.searchParams.has(parameterName),
+  );
+
+  if (isPresentationHandshake) {
+    return handlePresentationHandshake(request, requestUrl);
   }
 
   const manualPreviewSecret = process.env.SANITY_PREVIEW_SECRET?.trim();
