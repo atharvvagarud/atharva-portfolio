@@ -7,6 +7,8 @@ import { SANITY_CACHE_TAGS } from "@/sanity/cache";
 
 export const runtime = "nodejs";
 
+const MAX_WEBHOOK_BODY_BYTES = 16 * 1024;
+
 const revalidationTargets = {
   siteSettings: {
     tags: [SANITY_CACHE_TAGS.siteSettings],
@@ -56,8 +58,55 @@ function response(
       timestamp: new Date().toISOString(),
       ...(values.error ? { error: values.error } : {}),
     },
-    { status },
+    {
+      status,
+      headers: { "Cache-Control": "no-store" },
+    },
   );
+}
+
+type PayloadReadResult =
+  | { readonly ok: true; readonly payload: unknown }
+  | { readonly ok: false; readonly reason: "malformed" | "too-large" };
+
+async function readWebhookPayload(request: Request): Promise<PayloadReadResult> {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength) {
+    const declaredBytes = Number(contentLength);
+    if (
+      Number.isFinite(declaredBytes) &&
+      declaredBytes > MAX_WEBHOOK_BODY_BYTES
+    ) {
+      return { ok: false, reason: "too-large" };
+    }
+  }
+
+  if (!request.body) return { ok: false, reason: "malformed" };
+
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let receivedBytes = 0;
+  let body = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      receivedBytes += value.byteLength;
+      if (receivedBytes > MAX_WEBHOOK_BODY_BYTES) {
+        await reader.cancel();
+        return { ok: false, reason: "too-large" };
+      }
+
+      body += decoder.decode(value, { stream: true });
+    }
+
+    body += decoder.decode();
+    return { ok: true, payload: JSON.parse(body) as unknown };
+  } catch {
+    return { ok: false, reason: "malformed" };
+  }
 }
 
 function suppliedSecret(request: Request): string | null {
@@ -108,16 +157,30 @@ export async function POST(request: Request) {
     });
   }
 
-  let payload: WebhookPayload;
-  try {
-    payload = (await request.json()) as WebhookPayload;
-  } catch {
-    return response(400, {
+  const contentType = request.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (contentType !== "application/json") {
+    return response(415, {
       revalidated: false,
       documentType: null,
-      error: "Malformed JSON payload.",
+      error: "Content-Type must be application/json.",
     });
   }
+
+  const payloadResult = await readWebhookPayload(request);
+  if (!payloadResult.ok) {
+    const tooLarge = payloadResult.reason === "too-large";
+    return response(tooLarge ? 413 : 400, {
+      revalidated: false,
+      documentType: null,
+      error: tooLarge ? "Payload is too large." : "Malformed JSON payload.",
+    });
+  }
+
+  const payload = payloadResult.payload as WebhookPayload;
 
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return response(400, {
@@ -138,9 +201,7 @@ export async function POST(request: Request) {
   const documentType = payload._type.trim();
   if (!isSupportedDocumentType(documentType)) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(
-        `[sanity-revalidate] ignored type=${documentType} reason=unsupported-type`,
-      );
+      console.warn("[sanity-revalidate] ignored reason=unsupported-type");
     }
 
     return response(200, {
@@ -181,4 +242,3 @@ export async function POST(request: Request) {
     });
   }
 }
-

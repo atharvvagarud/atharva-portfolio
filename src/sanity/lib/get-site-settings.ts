@@ -79,9 +79,19 @@ function normalizeCvFile(
 ): SiteFileAsset | null {
   const asset = value?.asset;
   const url = validHttpUrl(asset?.url, null);
-  if (!url) return siteSettingsFallback.cvFile;
+  const mimeType = asset?.mimeType?.trim().toLowerCase();
+  if (!url || mimeType !== "application/pdf") {
+    return siteSettingsFallback.cvFile;
+  }
 
-  const filename = asset?.originalFilename?.trim() || "atharva-garud-cv.pdf";
+  const originalFilename =
+    asset?.originalFilename?.trim() || "atharva-garud-cv.pdf";
+  const sanitizedFilename = originalFilename
+    .replace(/[\u0000-\u001f\u007f/\\]/g, "-")
+    .slice(0, 128);
+  const filename = sanitizedFilename.toLowerCase().endsWith(".pdf")
+    ? sanitizedFilename
+    : `${sanitizedFilename || "atharva-garud-cv"}.pdf`;
   const downloadUrl = new URL(url);
   downloadUrl.searchParams.set("dl", filename);
 
@@ -89,7 +99,7 @@ function normalizeCvFile(
     url,
     downloadUrl: downloadUrl.toString(),
     filename,
-    mimeType: asset?.mimeType?.trim() || null,
+    mimeType,
     size:
       typeof asset?.size === "number" && asset.size >= 0 ? asset.size : null,
   };
