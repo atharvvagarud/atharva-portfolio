@@ -77,11 +77,13 @@ export default async function AboutPage() {
     ? {
         href: settings.cvFile.downloadUrl,
         filename: settings.cvFile.filename,
+        external: true,
       }
     : ABOUT_CV_FALLBACK.available
       ? {
           href: ABOUT_CV_FALLBACK.url,
           filename: ABOUT_CV_FALLBACK.filename,
+          external: false,
         }
       : null;
 
@@ -208,6 +210,13 @@ export default async function AboutPage() {
                 className="button-primary about-cv-button"
                 href={cvDownload.href}
                 download={cvDownload.filename}
+                target={cvDownload.external ? "_blank" : undefined}
+                rel={cvDownload.external ? "noopener noreferrer" : undefined}
+                aria-label={
+                  cvDownload.external
+                    ? `${content.cvCtaLabel}, opens in a new tab`
+                    : content.cvCtaLabel
+                }
               >
                 {content.cvCtaLabel}
                 <Download aria-hidden="true" size={17} strokeWidth={1.5} />

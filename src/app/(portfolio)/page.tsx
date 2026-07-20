@@ -3,9 +3,9 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { LondonTime } from "@/components/london-time";
-import { HeroReveal, RevealArticle, SectionReveal } from "@/components/motion/reveal";
 import { SiteContainer } from "@/components/site-container";
 import { pageSeo } from "@/config/site";
+import { ABOUT_CV_FALLBACK } from "@/data/about";
 import { createPageMetadata } from "@/lib/seo";
 import { getProjectDestination } from "@/lib/project-links";
 import { getSiteContactLinks, type SiteLink } from "@/lib/site-links";
@@ -76,12 +76,18 @@ function SocialLink({
 function Hero({
   content,
   socialLinks,
+  cvDownload,
 }: {
   content: HomepageContent;
   socialLinks: readonly SiteLink[];
+  cvDownload: {
+    readonly href: string;
+    readonly filename: string;
+    readonly external: boolean;
+  } | null;
 }) {
   return (
-    <HeroReveal className="home-hero" aria-labelledby="home-title">
+    <section className="home-hero" aria-labelledby="home-title">
       <p className="availability">
         <span className="status-dot" aria-hidden="true" />
         {content.availabilityText}
@@ -108,10 +114,23 @@ function Hero({
       </div>
 
       <div className="home-actions">
-        <Link className="button-primary home-work-button" href="#selected-work">
-          View selected work
-          <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />
-        </Link>
+        {cvDownload ? (
+          <a
+            className="button-primary home-cv-button"
+            href={cvDownload.href}
+            download={cvDownload.filename}
+            target={cvDownload.external ? "_blank" : undefined}
+            rel={cvDownload.external ? "noopener noreferrer" : undefined}
+            aria-label={
+              cvDownload.external
+                ? "Download Atharva Garud CV PDF, opens in a new tab"
+                : "Download Atharva Garud CV PDF"
+            }
+          >
+            Download CV
+            <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.5} />
+          </a>
+        ) : null}
 
         {socialLinks.length > 0 ? (
           <div className="home-socials" aria-label="Social links">
@@ -121,13 +140,13 @@ function Hero({
           </div>
         ) : null}
       </div>
-    </HeroReveal>
+    </section>
   );
 }
 
 function SelectedWork({ projects }: { projects: readonly Project[] }) {
   return (
-    <section id="selected-work" className="home-section" aria-labelledby="selected-work-title">
+    <section className="home-section" aria-labelledby="selected-work-title">
       <SectionLabel id="selected-work-title" number="01">Selected work</SectionLabel>
 
       <div className="project-list">
@@ -136,11 +155,7 @@ function SelectedWork({ projects }: { projects: readonly Project[] }) {
           const indexLabel = String(index + 1).padStart(2, "0");
 
           return (
-            <RevealArticle
-              className="project-row"
-              delay={index * 0.05}
-              key={project.id}
-            >
+            <article className="project-row" key={project.id}>
               <p className="project-row__index">{indexLabel}</p>
               <div className="project-row__title-wrap">
                 <h3 className="project-row__title">{project.title}</h3>
@@ -169,7 +184,7 @@ function SelectedWork({ projects }: { projects: readonly Project[] }) {
                   />
                 </Link>
               ) : null}
-            </RevealArticle>
+            </article>
           );
         })}
       </div>
@@ -185,7 +200,7 @@ function ProfileAndCurrently({ content }: { content: HomepageContent }) {
   ] as const;
 
   return (
-    <SectionReveal className="profile-currently" aria-label="Profile and current interests">
+    <section className="profile-currently" aria-label="Profile and current interests">
       <div className="profile-block">
         <SectionLabel number="02">Profile</SectionLabel>
         <p className="profile-copy">{content.profileSummary}</p>
@@ -210,14 +225,14 @@ function ProfileAndCurrently({ content }: { content: HomepageContent }) {
           ))}
         </dl>
       </div>
-    </SectionReveal>
+    </section>
   );
 }
 
 function OffScreenPanel({ item }: { item: HomepageOffScreenItem }) {
   const isText = item.type === "text";
   const panel = (
-    <article className={`off-screen-panel off-screen-panel--${item.type}`}>
+    <article className={`off-screen-item off-screen-panel off-screen-panel--${item.type}`}>
       {item.smallLabel ? (
         <p className="off-screen-panel__label">{item.smallLabel}</p>
       ) : null}
@@ -248,7 +263,7 @@ function OffScreenPanel({ item }: { item: HomepageOffScreenItem }) {
 
 function OffScreen({ items }: { items: readonly HomepageOffScreenItem[] }) {
   return (
-    <SectionReveal className="home-section off-screen" aria-labelledby="off-screen-title">
+    <section className="home-section off-screen" aria-labelledby="off-screen-title">
       <SectionLabel id="off-screen-title" number="04">Off screen</SectionLabel>
       <div className="off-screen-grid">
         {items.map((item) => {
@@ -286,17 +301,13 @@ function OffScreen({ items }: { items: readonly HomepageOffScreenItem[] }) {
           );
         })}
       </div>
-    </SectionReveal>
+    </section>
   );
 }
 
-function ContactFooter({
-  settings,
-  socialLinks,
-}: {
-  settings: SiteSettings;
-  socialLinks: readonly SiteLink[];
-}) {
+function ContactFooter({ settings }: { settings: SiteSettings }) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer id="contact" className="contact-footer">
       <div className="contact-footer__lead">
@@ -309,15 +320,11 @@ function ContactFooter({
         ) : null}
       </div>
 
-      <p className="contact-footer__location">{settings.location}</p>
-
-      {socialLinks.length > 0 ? (
-        <nav className="contact-footer__links" aria-label="Contact links">
-          {socialLinks.map((link) => (
-            <SocialLink key={link.label} {...link} />
-          ))}
-        </nav>
-      ) : null}
+      <div className="contact-footer__metadata" aria-label="Footer information">
+        <p>{settings.location}</p>
+        <p>{settings.availabilityLabel}</p>
+        <p>© {currentYear} Atharva Garud</p>
+      </div>
     </footer>
   );
 }
@@ -326,15 +333,32 @@ export default async function Home() {
   const settings = await getSiteSettings();
   const content = await getHomepageContent(settings.location);
   const socialLinks = getSiteContactLinks(settings);
+  const cvDownload = settings.cvFile
+    ? {
+        href: settings.cvFile.downloadUrl,
+        filename: settings.cvFile.filename,
+        external: true,
+      }
+    : ABOUT_CV_FALLBACK.available
+      ? {
+          href: ABOUT_CV_FALLBACK.url,
+          filename: ABOUT_CV_FALLBACK.filename,
+          external: false,
+        }
+      : null;
 
   return (
     <SiteContainer>
-      <Hero content={content} socialLinks={socialLinks} />
+      <Hero
+        content={content}
+        socialLinks={socialLinks}
+        cvDownload={cvDownload}
+      />
       <hr className="divider" />
       <SelectedWork projects={content.selectedProjects} />
       <ProfileAndCurrently content={content} />
       <OffScreen items={content.offScreenItems} />
-      <ContactFooter settings={settings} socialLinks={socialLinks} />
+      <ContactFooter settings={settings} />
     </SiteContainer>
   );
 }

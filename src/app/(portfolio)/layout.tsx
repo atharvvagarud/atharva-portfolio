@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
+import { HeroCircleWipe } from "@/components/animation/hero-circle-wipe";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { PreviewIndicator } from "@/components/preview-indicator";
 import { SiteHeader } from "@/components/site-header";
@@ -124,6 +125,7 @@ export default async function PortfolioLayout({
 
   return (
     <SmoothScrollProvider>
+      <HeroCircleWipe />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

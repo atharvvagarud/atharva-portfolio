@@ -34,11 +34,12 @@ export const siteSettingsFallback = {
   productionSiteUrl: optionalHttpUrl(process.env.SITE_URL) || DEFAULT_SITE_URL,
   email: optionalEmail(process.env.SITE_EMAIL),
   location: "London, UK",
-  availabilityLabel: "Available for new graduate roles",
+  availabilityLabel: "Available for graduate roles",
   githubUrl: optionalHttpUrl(process.env.GITHUB_URL),
   linkedinUrl: optionalHttpUrl(process.env.LINKEDIN_URL),
   instagramUrl: null,
-  footerMessage: "Have an opportunity or interesting project?",
+  footerMessage:
+    "Selected work and photography from a software engineer based in London.",
   cvFile: null,
   defaultOpenGraphImage: {
     url: "/images/og/homepage.png",

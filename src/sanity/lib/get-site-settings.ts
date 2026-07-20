@@ -35,6 +35,16 @@ function nonEmptyString(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback;
 }
 
+function normalizeFooterMessage(value: string | null | undefined): string {
+  const message = value?.trim();
+
+  if (!message || /\bnotes\b/i.test(message)) {
+    return siteSettingsFallback.footerMessage;
+  }
+
+  return message;
+}
+
 function validHttpUrl(
   value: string | null | undefined,
   fallback: string | null,
@@ -156,10 +166,7 @@ function normalizeSiteSettings(value: SiteSettingsQueryResult): SiteSettings {
       value.instagramUrl,
       siteSettingsFallback.instagramUrl,
     ),
-    footerMessage: nonEmptyString(
-      value.footerMessage,
-      siteSettingsFallback.footerMessage,
-    ),
+    footerMessage: normalizeFooterMessage(value.footerMessage),
     cvFile: normalizeCvFile(value.cvFile),
     defaultOpenGraphImage: normalizeOpenGraphImage(
       value.defaultOpenGraphImage,

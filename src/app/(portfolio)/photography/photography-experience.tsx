@@ -5,11 +5,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { LondonTime } from "@/components/london-time";
-import {
-  photoFilters,
-  type Photo,
-  type PhotoFilter,
-} from "@/types/photo";
+import type { Photo } from "@/types/photo";
 
 type PhotographyExperienceProps = {
   photos: readonly Photo[];
@@ -41,7 +37,6 @@ export function PhotographyExperience({
   ownerName,
   sharedSettings,
 }: PhotographyExperienceProps) {
-  const [activeFilter, setActiveFilter] = useState<PhotoFilter>("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const reduceMotion = useReducedMotion();
   const lastSelectedId = useRef<string | null>(null);
@@ -49,15 +44,10 @@ export function PhotographyExperience({
   const viewerWasOpen = useRef(false);
   const photoButtons = useRef<Record<string, HTMLButtonElement | null>>({});
 
-  const visiblePhotos =
-    activeFilter === "All"
-      ? photos
-      : photos.filter((photo) => photo.category === activeFilter);
-
   const activeIndex = selectedId
-    ? visiblePhotos.findIndex((photo) => photo.id === selectedId)
+    ? photos.findIndex((photo) => photo.id === selectedId)
     : -1;
-  const activePhoto = activeIndex >= 0 ? visiblePhotos[activeIndex] : null;
+  const activePhoto = activeIndex >= 0 ? photos[activeIndex] : null;
 
   const openPhoto = (photoId: string) => {
     lastSelectedId.current = photoId;
@@ -75,12 +65,12 @@ export function PhotographyExperience({
 
   const navigate = useCallback(
     (direction: -1 | 1) => {
-      if (activeIndex < 0 || visiblePhotos.length === 0) return;
+      if (activeIndex < 0 || photos.length < 2) return;
       const nextIndex =
-        (activeIndex + direction + visiblePhotos.length) % visiblePhotos.length;
-      setSelectedId(visiblePhotos[nextIndex].id);
+        (activeIndex + direction + photos.length) % photos.length;
+      setSelectedId(photos[nextIndex].id);
     },
-    [activeIndex, visiblePhotos],
+    [activeIndex, photos],
   );
 
   useEffect(() => {
@@ -112,8 +102,9 @@ export function PhotographyExperience({
   }, [activePhoto, closeViewer, navigate]);
 
   if (activePhoto) {
+    const canNavigate = photos.length > 1;
     const currentNumber = String(activeIndex + 1).padStart(2, "0");
-    const totalNumber = String(visiblePhotos.length).padStart(2, "0");
+    const totalNumber = String(photos.length).padStart(2, "0");
 
     return (
       <motion.section
@@ -171,11 +162,19 @@ export function PhotographyExperience({
             ) : null}
 
             <div className="photo-viewer__navigation" aria-label="Photo navigation">
-              <button type="button" onClick={() => navigate(-1)}>
+              <button
+                type="button"
+                disabled={!canNavigate}
+                onClick={() => navigate(-1)}
+              >
                 <ArrowLeft aria-hidden="true" size={17} strokeWidth={1.5} />
                 Previous
               </button>
-              <button type="button" onClick={() => navigate(1)}>
+              <button
+                type="button"
+                disabled={!canNavigate}
+                onClick={() => navigate(1)}
+              >
                 Next
                 <ArrowRight aria-hidden="true" size={17} strokeWidth={1.5} />
               </button>
@@ -233,31 +232,8 @@ export function PhotographyExperience({
             Photography index
           </h2>
 
-          <div className="photo-filters" role="group" aria-label="Filter photographs">
-            {photoFilters.map((filter) => (
-              <button
-                className="photo-filter"
-                type="button"
-                key={filter}
-                aria-pressed={activeFilter === filter}
-                aria-controls="photography-grid"
-                onClick={() => setActiveFilter(filter)}
-              >
-                <span
-                  className="photo-filter__indicator"
-                  aria-hidden="true"
-                />
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          <p className="sr-only" aria-live="polite">
-            {visiblePhotos.length} {visiblePhotos.length === 1 ? "photograph" : "photographs"} shown
-          </p>
-
-          <div className="photo-grid" id="photography-grid">
-            {visiblePhotos.map((photo, index) => (
+          <div className="photo-grid">
+            {photos.map((photo, index) => (
               <motion.button
                 className="photo-tile motion-reveal"
                 type="button"

@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { DesktopNavigation } from "@/components/desktop-navigation";
 import { MobileMenu } from "@/components/mobile-menu";
 import { SiteContainer } from "@/components/site-container";
 import { siteOwnerName } from "@/config/site";
@@ -19,15 +20,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="site-nav" aria-label="Primary navigation">
-          <ul className="site-nav__links">
-            {navigation.map((item) => (
-              <li key={item.href}>
-                <Link className="site-nav__link" href={item.href}>
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <DesktopNavigation items={navigation} />
           <Link className="button-primary button-primary--outline" href="/#contact">
             Get in touch
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.5} />

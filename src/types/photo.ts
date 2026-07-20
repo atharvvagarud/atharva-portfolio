@@ -10,7 +10,6 @@ export const photoCategories = [
 ] as const;
 
 export type PhotoCategory = (typeof photoCategories)[number];
-export type PhotoFilter = "All" | PhotoCategory;
 
 export type Photo = {
   readonly id: string;
@@ -28,5 +27,3 @@ export type Photo = {
   readonly featured: boolean;
   readonly displayOrder: number;
 };
-
-export const photoFilters: readonly PhotoFilter[] = ["All", ...photoCategories];
